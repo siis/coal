@@ -1,0 +1,310 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+<TITLE>BNF for propagation.jj</TITLE>
+</HEAD>
+<BODY>
+<H1 ALIGN=CENTER>BNF for propagation.jj</H1>
+<H2 ALIGN=CENTER>TOKENS</H2>
+<TABLE>
+ <!-- Token -->
+ <TR>
+  <TD>
+   <PRE>
+&lt;DEFAULT&gt; SKIP : {
+" "
+| "\t"
+| "\n"
+| "\r"
+| "\r\n"
+| &lt;"/*" (~["*"])* "*" ("*" | ~["*","/"] (~["*"])* "*")* "/"&gt;
+}
+
+   </PRE>
+  </TD>
+ </TR>
+ <!-- Token -->
+ <TR>
+  <TD>
+   <PRE>
+&lt;DEFAULT&gt; TOKEN : {
+&lt;CLASS: "class"&gt;
+| &lt;SINK: "sink"&gt;
+| &lt;TYPE: "type"&gt;
+| &lt;ARGUMENT: "argument"&gt;
+| &lt;COPY: "copy"&gt;
+| &lt;LBRACKET: "["&gt;
+| &lt;RBRACKET: "]"&gt;
+| &lt;INIT: "&lt;init&gt;"&gt;
+| &lt;CLINIT: "&lt;clinit&gt;"&gt;
+| &lt;HOTSPOT: "hotspot"&gt;
+| &lt;SUPER: "super"&gt;
+| &lt;INLINE: "inline"&gt;
+| &lt;EXCLUDE: "exclude"&gt;
+| &lt;GEN: "gen"&gt;
+| &lt;SOURCE: "source"&gt;
+| &lt;STATICFIELD: "staticfield"&gt;
+| &lt;COLON: ":"&gt;
+| &lt;EQUALS: "="&gt;
+| &lt;PROPERTIES: "prop"&gt;
+| &lt;COUNT: "count"&gt;
+}
+
+   </PRE>
+  </TD>
+ </TR>
+ <!-- Token -->
+ <TR>
+  <TD>
+   <PRE>
+&lt;DEFAULT&gt; TOKEN : {
+&lt;INTEGER: (["+","-"])? (&lt;DIGIT&gt;)+&gt;
+| &lt;SHORT_SIGNATURE: &lt;TYPE_DESCRIPTOR&gt; " " ((&lt;LETTER&gt; | &lt;DIGIT&gt;)+ | &lt;INIT&gt; | &lt;CLINIT&gt;) "(" (&lt;TYPE_DESCRIPTOR&gt; | ",")* ")"&gt;
+| &lt;SIGNATURE: "&lt;" &lt;TYPE_DESCRIPTOR&gt; ": " &lt;SHORT_SIGNATURE&gt; "&gt;"&gt;
+| &lt;IDENTIFIER: &lt;LETTER&gt; (&lt;LETTER&gt; | &lt;DIGIT&gt; | "_")*&gt;
+| &lt;TYPE_DESCRIPTOR: &lt;LETTER&gt; (&lt;LETTER&gt; | &lt;DIGIT&gt; | &lt;IDENTIFIER&gt; | &lt;LBRACKET&gt; | &lt;RBRACKET&gt; | "." | "$")*&gt;
+| &lt;STATIC_FIELD_SIGNATURE: "&lt;" &lt;TYPE_DESCRIPTOR&gt; ": " &lt;TYPE_DESCRIPTOR&gt; " " &lt;IDENTIFIER&gt; "&gt;"&gt;
+| &lt;STRING_LITERAL: "\"" (~["\"","\\","\n","\r"] | "\\" (["n","t","b","r","f","\\","\'","\""] | ["0"-"7"] (["0"-"7"])? | ["0"-"3"] ["0"-"7"] ["0"-"7"] | ["\n","\r"] | "\r\n"))* "\""&gt;
+| &lt;#LETTER: ["a"-"z","A"-"Z"]&gt;
+| &lt;#DIGIT: ["0"-"9"]&gt;
+}
+
+   </PRE>
+  </TD>
+ </TR>
+</TABLE>
+<H2 ALIGN=CENTER>NON-TERMINALS</H2>
+<TABLE>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod1">start</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( <A HREF="#prod2">object</A> )+</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod2">object</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;CLASS&gt; <A HREF="#prod3">classIdentifier</A> "{" <A HREF="#prod4">classDeclaration</A> "}"</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod3">classIdentifier</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE><A HREF="#prod5">typeDescriptor</A></TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod4">classDeclaration</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( <A HREF="#prod6">fieldDeclaration</A> | <A HREF="#prod7">argument</A> | <A HREF="#prod8">sink</A> | <A HREF="#prod9">copy</A> | <A HREF="#prod10">superclassDeclaration</A> | <A HREF="#prod11">hotspot</A> | <A HREF="#prod12">exclude</A> | <A HREF="#prod13">source</A> | <A HREF="#prod14">staticField</A> )*</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod6">fieldDeclaration</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;IDENTIFIER&gt; &lt;IDENTIFIER&gt; ( <A HREF="#prod15">count</A> )? ";"</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod5">typeDescriptor</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( &lt;TYPE_DESCRIPTOR&gt; | &lt;IDENTIFIER&gt; )</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod7">argument</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;ARGUMENT&gt; &lt;IDENTIFIER&gt; &lt;EQUALS&gt; <A HREF="#prod16">argumentDeclaration</A></TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod16">argumentDeclaration</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( <A HREF="#prod17">argumentWithNumbers</A> | <A HREF="#prod18">argumentWithoutNumbers</A> )</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod17">argumentWithNumbers</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE><A HREF="#prod19">numbers</A> ( ";" | &lt;COLON&gt; <A HREF="#prod20">actionAndField</A> ( "," <A HREF="#prod21">argumentDeclarationElement</A> )* ";" | &lt;COLON&gt; <A HREF="#prod21">argumentDeclarationElement</A> ( "," <A HREF="#prod21">argumentDeclarationElement</A> )* ";" )</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod18">argumentWithoutNumbers</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( <A HREF="#prod22">field</A> ";" | <A HREF="#prod20">actionAndField</A> ( "," <A HREF="#prod21">argumentDeclarationElement</A> )* ";" )</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod20">actionAndField</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE><A HREF="#prod23">actions</A> <A HREF="#prod22">field</A> ( <A HREF="#prod24">inlineValues</A> )?</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod21">argumentDeclarationElement</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( <A HREF="#prod25">type</A> | <A HREF="#prod26">properties</A> )</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod19">numbers</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( <A HREF="#prod27">singleNumber</A> | <A HREF="#prod28">multipleNumbers</A> )</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod27">singleNumber</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;INTEGER&gt;</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod28">multipleNumbers</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"(" <A HREF="#prod29">multipleNumbersElement</A> ( "," <A HREF="#prod29">multipleNumbersElement</A> )* ")"</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod29">multipleNumbersElement</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;INTEGER&gt;</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod22">field</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;IDENTIFIER&gt;</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod25">type</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;TYPE&gt; <A HREF="#prod5">typeDescriptor</A> ( &lt;COLON&gt; &lt;IDENTIFIER&gt; )?</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod24">inlineValues</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( <A HREF="#prod30">singleInlineValue</A> | <A HREF="#prod31">multipleInlineValues</A> )</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod30">singleInlineValue</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE><A HREF="#prod32">inlineValue</A></TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod31">multipleInlineValues</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"(" <A HREF="#prod32">inlineValue</A> ( "," <A HREF="#prod32">inlineValue</A> )* ")"</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod32">inlineValue</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( &lt;STRING_LITERAL&gt; | &lt;INTEGER&gt; )</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod23">actions</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( <A HREF="#prod33">singleAction</A> | <A HREF="#prod34">multipleActions</A> )</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod33">singleAction</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;IDENTIFIER&gt;</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod34">multipleActions</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"(" &lt;IDENTIFIER&gt; ( "," &lt;IDENTIFIER&gt; )* ")"</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod26">properties</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;PROPERTIES&gt; ( <A HREF="#prod35">singleProperty</A> | <A HREF="#prod36">multipleProperties</A> )</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod35">singleProperty</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE><A HREF="#prod32">inlineValue</A> &lt;COLON&gt; <A HREF="#prod32">inlineValue</A></TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod36">multipleProperties</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"(" <A HREF="#prod32">inlineValue</A> &lt;COLON&gt; <A HREF="#prod32">inlineValue</A> ( "," <A HREF="#prod32">inlineValue</A> &lt;COLON&gt; <A HREF="#prod32">inlineValue</A> )* ")"</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod15">count</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"(" &lt;INTEGER&gt; ")"</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod8">sink</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;SINK&gt; <A HREF="#prod37">sinkModifier</A> <A HREF="#prod38">extendedSignature</A> "{" <A HREF="#prod39">sinkOrHotspotOrFieldDeclaration</A> "}"</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod37">sinkModifier</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( ( &lt;GEN&gt; | &lt;COPY&gt; ) )?</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod38">extendedSignature</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( <A HREF="#prod40">hotspotOrSinkSignature</A> | <A HREF="#prod41">superclass</A> &lt;COLON&gt; <A HREF="#prod42">hotspotShortSignature</A> )</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod39">sinkOrHotspotOrFieldDeclaration</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( ( <A HREF="#prod43">namedArgument</A> | <A HREF="#prod16">argumentDeclaration</A> ) )*</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod43">namedArgument</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;ARGUMENT&gt; &lt;IDENTIFIER&gt; ";"</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod9">copy</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;COPY&gt; &lt;SIGNATURE&gt; "{" <A HREF="#prod39">sinkOrHotspotOrFieldDeclaration</A> "}"</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod11">hotspot</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;HOTSPOT&gt; <A HREF="#prod38">extendedSignature</A> "{" <A HREF="#prod39">sinkOrHotspotOrFieldDeclaration</A> "}"</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod40">hotspotOrSinkSignature</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;SIGNATURE&gt;</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod10">superclassDeclaration</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;SUPER&gt; &lt;IDENTIFIER&gt; &lt;EQUALS&gt; <A HREF="#prod5">typeDescriptor</A> ";"</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod41">superclass</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE><A HREF="#prod44">namedSuperclass</A></TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod44">namedSuperclass</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;IDENTIFIER&gt;</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod42">hotspotShortSignature</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;SHORT_SIGNATURE&gt;</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod12">exclude</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;EXCLUDE&gt; &lt;TYPE_DESCRIPTOR&gt; ";"</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod13">source</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;SOURCE&gt; &lt;SIGNATURE&gt; "{" <A HREF="#prod39">sinkOrHotspotOrFieldDeclaration</A> "}"</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod14">staticField</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;STATICFIELD&gt; ( <A HREF="#prod45">shortStaticField</A> | <A HREF="#prod46">extendedStaticField</A> )</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod45">shortStaticField</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;IDENTIFIER&gt; &lt;STATIC_FIELD_SIGNATURE&gt; &lt;EQUALS&gt; <A HREF="#prod24">inlineValues</A> ";"</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod46">extendedStaticField</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;STATIC_FIELD_SIGNATURE&gt; "{" <A HREF="#prod39">sinkOrHotspotOrFieldDeclaration</A> "}"</TD>
+</TR>
+</TABLE>
+</BODY>
+</HTML>
