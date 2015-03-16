@@ -1,10 +1,9 @@
 /*
- * Copyright 2015 Systems and Internet Infrastructure Security Laboratory at the Pennsylvania
- * State University
- * Copyright 2015 The University of Wisconsin
- * 
+ * Copyright (C) 2015 The Pennsylvania State University and the University of Wisconsin
+ * Systems and Internet Infrastructure Security Laboratory
+ *
  * Author: Damien Octeau
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,7 +16,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package edu.psu.cse.siis.coal.transformers;
 
 import java.util.HashMap;
