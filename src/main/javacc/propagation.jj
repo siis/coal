@@ -1,0 +1,693 @@
+// Copyright 2015 Systems and Internet Infrastructure Security Laboratory at the Pennsylvania
+// State University
+// Copyright 2015 The University of Wisconsin
+// 
+// Author: Damien Octeau
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+options {
+  STATIC = false;
+  SUPPORT_CLASS_VISIBILITY_PUBLIC = false;
+//  DEBUG_LOOKAHEAD = true;
+//  DEBUG_PARSER = true;
+//  DEBUG_TOKEN_MANAGER = true;
+}
+
+PARSER_BEGIN(PropagationParser)
+
+package edu.psu.cse.siis.coal.lang;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import edu.psu.cse.siis.coal.ExtendedSignature;
+import edu.psu.cse.siis.coal.Model;
+import edu.psu.cse.siis.coal.arguments.Argument;
+import edu.psu.cse.siis.coal.arguments.Field;
+
+public class PropagationParser {
+
+  private static Logger logger = LoggerFactory.getLogger(PropagationParser.class);
+
+  private Model model;
+  private Map<String, Argument> namedArguments;
+  private Map<String, String> namedSuperclasses;
+  private Map<String, Field> fields;
+
+  private void addModeledType(String type) {
+    model.addModeledType(type);
+  }
+    
+  private void addModifier(ExtendedSignature extendedSignature, Argument[] arguments,
+      String modifierModifier) {
+    model.addModifier(extendedSignature, arguments, modifierModifier);
+  }
+
+  private void addCopyConstructor(String signature, Argument[] arguments) {
+    model.addCopyConstructor(signature, arguments);
+  }
+
+  private void addQuery(ExtendedSignature extendedSignature, Argument[] arguments) {
+    model.addQuery(extendedSignature, arguments);
+  }
+
+  private void addNamedSuperclass(String name, String superclass) {
+    namedSuperclasses.put(name, superclass);
+  }
+
+  private void addExcludedClass(String name) {
+    model.addExcludedClass(name);
+  }
+
+  private void addSource(ExtendedSignature extendedSignature, Argument[] arguments) {
+    model.addSource(extendedSignature, arguments);
+  }
+
+  private void addConstant(String signature, Argument[] arguments) {
+    model.addConstant(signature, arguments);
+  }
+
+  private void addField(String name, String type, int count, int line) throws ParseException {
+    if (fields.containsKey(name)) {
+      throw new ParseException("Previously declared field " + name + " at line "
+          + line);
+    }
+    fields.put(name, new Field(name, type));
+  }
+  
+  private Field getField(String fieldName, int line) throws ParseException {
+    Field field = fields.get(fieldName);
+    if (field == null) {
+      throw new ParseException("Unknown field " + fieldName + " at line "
+          + line);
+    }
+    return field;
+  }
+
+  private String getNamedSuperclass(String name) throws ParseException {
+    String superclass = namedSuperclasses.get(name);
+    if (superclass == null) {
+      throw new ParseException("Undeclared superclass: " + name);
+    }
+    return superclass;
+  }
+
+  public static void parseModelFromDirectory(Model model, String dir) throws FileNotFoundException,
+            ParseException {
+    logger.info("Parsing model from directory " + dir);
+
+    List<File> files = new ArrayList<File>();
+    try {
+      DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get(dir), "*.model");
+      for (Path file : stream) {
+        files.add(file.toFile());
+      }
+      stream.close();
+    } catch (IOException e) {
+      throw new RuntimeException("Could not list model files in directory " + dir);
+    }
+
+    for (File file : files) {
+      parseModelFromFile(model, file);
+    }
+  }
+
+  public static void parseModelFromFile(Model model, File file)
+      throws FileNotFoundException, ParseException {
+    logger.info("Parsing model from file " + file);
+
+    PropagationParser parser = new PropagationParser(model, new FileInputStream(file));
+    parser.start();
+  }
+
+  private PropagationParser(Model model, java.io.InputStream inputStream) {
+    this(inputStream);
+    this.model = model;
+  }
+
+  public static void main(String[] args) throws FileNotFoundException, ParseException {
+    for (String filePath : args) {
+      Model.loadModelFromFile(filePath);
+    }
+    Model.v().endInitialization();
+    Model.v().dump();
+  }
+}
+
+PARSER_END(PropagationParser)
+
+SKIP : {
+  " " |
+  "\t" |
+  "\n" |
+  "\r" |
+  "\r\n" |
+  <"/*" (~["*"])* "*" ("*" | ~["*","/"] (~["*"])* "*")* "/">
+}
+
+TOKEN : {
+  <CLASS: "class"> |
+  <MODIFIER: "mod"> |
+  <TYPE: "type"> |
+  <ARGUMENT: "argument"> |
+  <COPY : "copy"> |
+  <LBRACKET: "["> |
+  <RBRACKET: "]"> |
+  <INIT: "<init>"> |
+  <CLINIT: "<clinit>"> |
+  <QUERY: "query"> |
+  <SUPER: "super"> |
+  <INLINE: "inline"> |
+  <EXCLUDE: "exclude"> |
+  <GEN: "gen"> |
+  <SOURCE: "source"> |
+  <STATICFIELD: "staticfield"> |
+  <COLON: ":"> |
+  <EQUALS: "="> |
+  <PROPERTIES: "prop"> |
+  <COUNT: "count">
+}
+
+TOKEN : {
+  <INTEGER: (["+","-"])? (<DIGIT>)+> |
+  <SHORT_SIGNATURE: <TYPE_DESCRIPTOR>
+          " " ((<LETTER> | <DIGIT>)+ | <INIT> | <CLINIT>)
+          "(" (<TYPE_DESCRIPTOR> | ",")*
+          ")"> |
+  <SIGNATURE: "<" <TYPE_DESCRIPTOR>
+          ": " <SHORT_SIGNATURE>
+          ">"> |
+  <IDENTIFIER: <LETTER> (<LETTER> | <DIGIT> | "_")*> |
+  <TYPE_DESCRIPTOR: <LETTER> (<LETTER> | <DIGIT> | <IDENTIFIER> | <LBRACKET> | <RBRACKET> | "." | "$")*> |
+  <STATIC_FIELD_SIGNATURE: "<" <TYPE_DESCRIPTOR> ": " <TYPE_DESCRIPTOR> " " <IDENTIFIER> ">"> |
+  <STRING_LITERAL: "\"" ( ~["\"","\\","\n","\r"] |
+          "\\" ( ["n","t","b","r","f","\\","\'","\""] |
+              ["0"-"7"] (["0"-"7"])?  | ["0"-"3"] ["0"-"7"] ["0"-"7"] |
+              ( ["\n","\r"] | "\r\n")))* "\""> |
+  <#LETTER: ["a"-"z","A"-"Z"]> |
+  <#DIGIT: ["0"-"9"]>
+}
+
+void start() : {
+  namedArguments = new HashMap<String, Argument>();
+  namedSuperclasses = new HashMap<String, String>();
+  fields = new HashMap<String, Field>();
+}{
+  (object())+
+}
+
+void object() : {}{
+  <CLASS> classIdentifier() "{"
+    classDeclaration()
+  "}"
+}
+
+void classIdentifier() : {
+  String type;
+}{
+  type = typeDescriptor()
+  { addModeledType(type); }
+}
+
+void classDeclaration() : {}{
+  (fieldDeclaration() |
+  argument() |
+  modifier() |
+  copy() |
+  superclassDeclaration() |
+  query() |
+  exclude() |
+  source() |
+  staticField())*
+}
+
+void fieldDeclaration() : {
+  Token t;
+  String name;
+  String type;
+  int count = -1;
+}{
+  t = <IDENTIFIER>
+  { type = t.image; }
+  t = <IDENTIFIER>
+  { name = t.image; }
+  [ count = count() ]
+  ";"
+  { addField(name, type, count, t.beginLine); }
+}
+
+String typeDescriptor() : {
+  Token t;
+}{
+  (LOOKAHEAD(<TYPE_DESCRIPTOR>) t = <TYPE_DESCRIPTOR> | t = <IDENTIFIER>)
+  { return t.image; }
+}
+
+void argument() : {
+  Token t;
+  String argumentName;
+  Argument argument;
+}{
+  <ARGUMENT>
+  t = <IDENTIFIER>
+  { argumentName = t.image; }
+  <EQUALS>
+  argument = argumentDeclaration()
+  { namedArguments.put(argumentName, argument); }
+}
+
+Argument argumentDeclaration() : {
+  Argument argument = new Argument();
+}{
+  (LOOKAHEAD(2) argumentWithNumbers(argument) |
+  argumentWithoutNumbers(argument))
+
+  { return argument; }
+}
+
+void argumentWithNumbers(Argument argument) : {}{
+  numbers(argument)
+  (";" |
+  LOOKAHEAD(2) <COLON> actionAndField(argument)
+  ("," argumentDeclarationElement(argument))* ";" |
+  <COLON> argumentDeclarationElement(argument)
+  ("," argumentDeclarationElement(argument))* ";")
+}
+
+void argumentWithoutNumbers(Argument argument) : {}{
+  (LOOKAHEAD(2) field(argument) ";" |
+  actionAndField(argument)
+  ("," argumentDeclarationElement(argument))* ";")
+}
+
+void actionAndField(Argument argument) : {}{
+  actions(argument) field(argument) [ inlineValues(argument) ]
+}
+
+void argumentDeclarationElement(Argument argument) : {}{
+  (type(argument) |
+  properties(argument))
+}
+
+void numbers(Argument argument) : {}{
+  (singleNumber(argument) |
+  multipleNumbers(argument))
+}
+
+void singleNumber(Argument argument) : {
+  Token t;
+}{
+  t = <INTEGER>
+  {
+    try {
+      argument.setArgnum(new int[] { Integer.parseInt(t.image) });
+    } catch (NumberFormatException e) {
+      throw new ParseException("Badly formatted integer: " + t.image);
+    }
+  }
+}
+
+void multipleNumbers(Argument argument) : {
+  int number;
+  List<Integer> numberList = new ArrayList<Integer>(2);
+}{
+  "("
+  number = multipleNumbersElement()
+  { numberList.add(number); }
+  (","
+  number = multipleNumbersElement()
+  { numberList.add(number); }
+  )*
+  ")"
+
+  {
+    int[] numbers = new int[numberList.size()];
+    for (int i = 0; i < numberList.size(); ++i) {
+      numbers[i] = numberList.get(i);
+    }
+    argument.setArgnum(numbers);
+  }
+}
+
+int multipleNumbersElement() : {
+  Token t;
+}{
+  t = <INTEGER>
+  {
+    try {
+      return Integer.parseInt(t.image);
+    } catch(NumberFormatException e) {
+      throw new ParseException("Badly formatted integer: " + t.image);
+    }
+  }
+}
+
+void field(Argument argument) : {
+  Token t;
+}{
+  t = <IDENTIFIER>
+  { argument.setField(getField(t.image, t.beginLine)); }
+}
+
+void type(Argument argument) : {
+  String type;
+  Token t;
+}{
+  <TYPE>
+  type = typeDescriptor()
+  { argument.setType(type); }
+  [ <COLON>
+  t = <IDENTIFIER>
+  { argument.setReferencedFieldName(t.image); }]
+}
+
+void inlineValues(Argument argument) : {}{
+  (singleInlineValue(argument) |
+  multipleInlineValues(argument))
+}
+
+void singleInlineValue(Argument argument) : {
+  String value;
+}{
+  value = inlineValue()
+  { argument.setInlineValues(new String[] { value }); }
+}
+
+void multipleInlineValues(Argument argument) : {
+  List<String> valueList = new ArrayList<String>();
+  String value;
+}{
+  "("
+  value = inlineValue()
+  { valueList.add(value); }
+  (","
+  value = inlineValue()
+  { valueList.add(value); }
+  )*
+  ")"
+
+  { argument.setInlineValues(valueList.toArray(new String[valueList.size()])); }
+}
+
+String inlineValue() : {
+  Token t;
+  String inlineValue;
+}{
+  (t = <STRING_LITERAL>
+  {
+    inlineValue = t.image;
+    inlineValue = inlineValue.substring(1, inlineValue.length() - 1);
+  } |
+  t = <INTEGER> { inlineValue = t.image; })
+  { return inlineValue; }
+}
+
+void actions(Argument argument) : {}{
+  (singleAction(argument) |
+  multipleActions(argument))
+}
+
+void singleAction(Argument argument) : {
+  Token t;
+}{
+  t = <IDENTIFIER>
+  { argument.setActions(new String[] { t.image }); }
+}
+
+void multipleActions(Argument argument) : {
+  Token t;
+  List<String> actionList = new ArrayList<String>(2);
+}{
+  "("
+  t = <IDENTIFIER>
+  { actionList.add(t.image); }
+  (","
+  t = <IDENTIFIER>
+  { actionList.add(t.image); }
+  )*
+  ")"
+
+  { argument.setActions(actionList.toArray(new String[actionList.size()])); }
+}
+
+void properties(Argument argument) : {}{
+  <PROPERTIES>
+  (singleProperty(argument) |
+  multipleProperties(argument))
+}
+
+void singleProperty(Argument argument) : {
+  String key, value;
+}{
+  key = inlineValue()
+  <COLON>
+  value = inlineValue()
+  { argument.addProperty(key, value); }
+}
+
+void multipleProperties(Argument argument) : {
+  String key, value;
+}{
+  "("
+  key = inlineValue()
+  <COLON>
+  value = inlineValue()
+  { argument.addProperty(key, value); }
+  (","
+  key = inlineValue()
+  <COLON>
+  value = inlineValue()
+  { argument.addProperty(key, value); }
+  )*
+  ")"
+}
+
+int count() : {
+  Token t;
+}{
+  "("
+  t = <INTEGER>
+  ")"
+  {  
+    try {
+      return Short.parseShort(t.image);
+    } catch (NumberFormatException e) {
+      throw new ParseException("Badly formatted integer: " + t.image);
+    }
+  }
+}
+
+void modifier() : {
+  ExtendedSignature extendedSignature;
+  Argument[] arguments;
+  String modifierModifier;
+}{
+  <MODIFIER>
+  modifierModifier = modifierModifier()
+  extendedSignature = extendedSignature()
+  "{"
+  arguments = modifierOrQueryOrFieldDeclaration()
+  "}"
+  { addModifier(extendedSignature, arguments, modifierModifier); }
+}
+
+String modifierModifier() : {
+  Token t;
+  String modifierModifier = null;
+}{
+  [(t = <GEN> |
+  t = <COPY>)
+  { modifierModifier = t.image; }]
+  { return modifierModifier; }
+}
+
+ExtendedSignature extendedSignature() : {
+  String signature;
+  String superclass = null;
+}{
+  (signature = queryOrModifierSignature() |
+  superclass = superclass()
+  <COLON>
+  signature = queryShortSignature())
+  { return new ExtendedSignature(signature, superclass); }
+}
+
+Argument[] modifierOrQueryOrFieldDeclaration() : {
+  Argument argument;
+  List<Argument> argumentList = new ArrayList<Argument>();
+}{
+  ((argument = namedArgument() |
+  argument = argumentDeclaration())
+  { argumentList.add(argument); }
+  )*
+
+  { return argumentList.toArray(new Argument[argumentList.size()]); }
+}
+
+Argument namedArgument() : {
+  Token t;
+}{
+  <ARGUMENT>
+  t = <IDENTIFIER>
+  ";"
+
+  {
+    Argument argument = namedArguments.get(t.image);
+    if (argument == null) {
+      throw new ParseException("Undefined argument: " + t.image);
+    }
+    return argument;
+  }
+}
+
+void copy() : {
+  Token t;
+  String signature;
+  Argument[] arguments;
+}{
+  <COPY>
+  t = <SIGNATURE>
+  { signature = t.image; }
+  "{"
+  arguments = modifierOrQueryOrFieldDeclaration()
+  "}"
+  { addCopyConstructor(signature, arguments); }
+}
+
+void query() : {
+  ExtendedSignature extendedSignature;
+  Argument[] arguments;
+}{
+  <QUERY>
+  extendedSignature = extendedSignature()
+  "{"
+  arguments = modifierOrQueryOrFieldDeclaration()
+  "}"
+
+  { addQuery(extendedSignature, arguments); }
+}
+
+String queryOrModifierSignature() : {
+  Token t;
+}{
+  t = <SIGNATURE>
+  { return t.image; }
+}
+
+void superclassDeclaration() : {
+  Token t;
+  String name;
+  String superclass;
+}{
+  <SUPER>
+  t = <IDENTIFIER>
+  <EQUALS>
+  { name = t.image; }
+  superclass = typeDescriptor()
+  ";"
+  { addNamedSuperclass(name, superclass); }
+}
+
+String superclass() : {
+  String superclass;
+}{
+  superclass = namedSuperclass()
+  { return superclass; }
+}
+
+String namedSuperclass() : {
+  Token t;
+}{
+  t = <IDENTIFIER>
+  { return getNamedSuperclass(t.image); }
+}
+
+String queryShortSignature() : {
+  Token t;
+}{
+  t = <SHORT_SIGNATURE>
+  { return t.image; }
+}
+
+void exclude() : {
+  Token t;
+}{
+  <EXCLUDE>
+  t = <TYPE_DESCRIPTOR>
+  ";"
+  { addExcludedClass(t.image); }
+}
+
+void source() : {
+  Token t;
+  String signature;
+  Argument[] arguments;
+}{
+  <SOURCE>
+  t = <SIGNATURE>
+  { signature = t.image; }
+  "{"
+  arguments = modifierOrQueryOrFieldDeclaration()
+  "}"
+  { addSource(new ExtendedSignature(signature, null), arguments); }
+}
+
+void staticField() : {}{
+  <STATICFIELD>
+  (shortStaticField() | extendedStaticField())
+}
+
+void shortStaticField() : {
+  Token t;
+  String signature;
+  Argument argument = new Argument();
+}{
+  t = <IDENTIFIER>
+  { argument.setField(getField(t.image, t.beginLine)); }
+  t = <STATIC_FIELD_SIGNATURE>
+  { signature = t.image; }
+  <EQUALS>
+  inlineValues(argument)
+  ";"
+  {
+    argument.setActions(new String[] { "replace" });
+    addConstant(signature, new Argument[] { argument });
+  }
+}
+
+void extendedStaticField() : {
+  Token t;
+  String signature;
+  Argument[] arguments;
+}{
+  t = <STATIC_FIELD_SIGNATURE>
+  { signature = t.image; }
+  "{"
+  arguments = modifierOrQueryOrFieldDeclaration()
+  "}"
+  { addConstant(signature, arguments); }
+}
