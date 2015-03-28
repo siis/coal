@@ -106,8 +106,8 @@ public class PropagationProblem
         // for (int i = 0; i < destinationMethod.getParameterCount(); ++i) {
         // if (invokeExpr.getArg(i) instanceof NullConstant && srcNode.equals(zeroValue())
         // && destNode.equals(destinationMethod.getActiveBody().getParameterLocal(i))) {
-        // CollectingTransformer collectingTransformer = new CollectingTransformer();
-        // collectingTransformer.addBranchTransformer(NullBranchTransformer.v());
+        // PropagationTransformer propagationTransformer = new PropagationTransformer();
+        // propagationTransformer.addBranchTransformer(NullBranchTransformer.v());
         // }
         // }
 

@@ -118,6 +118,6 @@ public abstract class CommandLineParser<A extends CommandLineArguments> {
         .withArgName("output").withLongOpt("output").create("out"));
     options.addOption(OptionBuilder.withDescription("Propagate through modeled classes.")
         .hasArg(false).create("traversemodeled"));
-    options.addOption("modeledtypesonly", false, "Only infer modeled types");
+    options.addOption("modeledtypesonly", false, "Only infer modeled types.");
   }
 }
