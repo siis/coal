@@ -18,11 +18,5 @@
  */
 package edu.psu.cse.siis.coal;
 
-public class DefaultResultProcessor {
-  public void processResult() {
-    System.out.println("\nThe following values were found:");
-    for (Result result : Results.getResults()) {
-      ((DefaultResult) result).dump();
-    }
-  }
+public class DefaultCommandLineArguments extends CommandLineArguments {
 }

@@ -35,6 +35,7 @@
   <developers>
     <developer>
       <name>Damien Octeau</name>
+      <url>http://www.cse.psu.edu/~duo114/</url>
     </developer>
   </developers>
 
@@ -66,6 +67,31 @@
           <source>1.7</source>
           <target>1.7</target>
         </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>2.5.3</version>
+        <configuration>
+          <archive>
+            <manifest>
+              <mainClass>edu.psu.cse.siis.coal.Main</mainClass>
+            </manifest>
+          </archive>
+          <descriptorRefs>
+            <descriptorRef>jar-with-dependencies</descriptorRef>
+          </descriptorRefs>
+          <appendAssemblyId>false</appendAssemblyId>
+        </configuration>
+        <executions>
+          <execution>
+            <!-- Automatically package everything during install or deploy phases. -->
+            <id>make-assembly</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
       	<groupId>org.apache.maven.plugins</groupId>
@@ -142,11 +168,11 @@
 
     <pluginManagement>
       <plugins>
-        <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no 
+        <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no
         influence on the Maven build itself.-->
-        
-        <!-- In order to be able to use this, the m2e connector for JavaCC must be installed. To do 
-        so, point Eclipse to 
+
+        <!-- In order to be able to use this, the m2e connector for JavaCC must be installed. To do
+        so, point Eclipse to
         http://objectledge.github.com/maven-extensions/connectors/updates/development. -->
    	    <plugin>
           <groupId>org.eclipse.m2e</groupId>
@@ -191,7 +217,43 @@
         </plugin>
       </plugins>
     </pluginManagement>
+
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <excludes>
+          <exclude>log4j.properties</exclude>
+        </excludes>
+        <filtering>false</filtering>
+      </resource>
+    </resources>
   </build>
+
+  <profiles>
+    <profile>
+      <!-- Use mvn clean compile package -P to generate standalone version with proper logging. -->
+      <id>standalone</id>
+      <dependencies>
+        <dependency>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-log4j12</artifactId>
+          <version>1.7.7</version>
+        </dependency>
+      </dependencies>
+
+      <build>
+        <resources>
+          <resource>
+            <directory>src/main/resources</directory>
+            <includes>
+              <include>log4j.properties</include>
+            </includes>
+            <filtering>false</filtering>
+          </resource>
+        </resources>
+      </build>
+    </profile>
+  </profiles>
 
   <dependencies>
     <dependency>

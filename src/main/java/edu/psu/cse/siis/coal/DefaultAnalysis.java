@@ -27,7 +27,10 @@ import java.util.Iterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import soot.EntryPoints;
 import soot.PackManager;
+import soot.Scene;
+import soot.SootClass;
 import soot.Transform;
 import soot.Value;
 import soot.options.Options;
@@ -81,6 +84,17 @@ public class DefaultAnalysis<A extends CommandLineArguments> extends Analysis<A>
     Options.v().set_prepend_classpath(true);
 
     Options.v().set_src_prec(Options.src_prec_java);
+
+    for (String analysisClass : AnalysisParameters.v().getAnalysisClasses()) {
+      SootClass sootClass = Scene.v().loadClassAndSupport(analysisClass);
+      Scene.v().forceResolve(analysisClass, SootClass.BODIES);
+      sootClass.setApplicationClass();
+    }
+
+    Scene.v().loadNecessaryClasses();
+
+    Scene.v().setMainClassFromOptions();
+    Scene.v().setEntryPoints(EntryPoints.v().application());
   }
 
   @Override

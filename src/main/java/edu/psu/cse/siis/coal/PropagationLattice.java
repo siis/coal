@@ -40,7 +40,7 @@ public class PropagationLattice implements JoinLattice<BasePropagationValue> {
 
   @Override
   public BasePropagationValue join(BasePropagationValue left, BasePropagationValue right) {
-    // In the case of a method which is considered an entry point and has an ICC object
+    // In the case of a method which is considered an entry point and has a modeled object
     // as an argument, as an "unassigned" argument it is assigned value top.
     // If another method calls it, then top will prevail if joining with top yields top.
     if (left instanceof BottomPropagationValue || left instanceof TopPropagationValue) {

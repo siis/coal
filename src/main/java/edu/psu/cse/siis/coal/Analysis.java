@@ -20,8 +20,11 @@ package edu.psu.cse.siis.coal;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 import soot.PackManager;
 import edu.psu.cse.siis.coal.lang.ParseException;
@@ -89,7 +92,7 @@ public abstract class Analysis<A extends CommandLineArguments> {
         Model.loadModelFromDirectory(commanLineArguments.getModel());
       }
     } catch (ClassNotFoundException | IOException | ParseException e) {
-      throw new FatalAnalysisException("Could not load ICC model", e);
+      throw new FatalAnalysisException("Could not load model", e);
     }
   }
 
@@ -198,20 +201,25 @@ public abstract class Analysis<A extends CommandLineArguments> {
       FatalAnalysisException exception);
 
   /**
-   * Recursively computes the set of classes in a directory. This method computes the fully
+   * Computes the set of classes in a directory or a jar file. This method computes the fully
    * qualified Java name of all the classes under a given directory. The class files can be in
    * multiple packages.
    * 
-   * @param directory A directory path.
+   * @param dirOrJar A directory or jar path.
    * @return The set of classes in the input directory.
    * @throws FatalAnalysisException if something goes wrong with the file operations.
    */
-  protected Set<String> computeAnalysisClasses(String directory) throws FatalAnalysisException {
+  protected Set<String> computeAnalysisClasses(String dirOrJar) throws FatalAnalysisException {
     try {
-      File directoryFile = new File(directory);
-      String directoryString = directoryFile.getCanonicalPath();
-      int basePos = directoryString.length() + 1;
-      return computeAnalysisClassesHelper(new File(directory), basePos);
+      File file = new File(dirOrJar);
+
+      if (file.isDirectory()) {
+        String directoryString = file.getCanonicalPath();
+        int basePos = directoryString.length() + 1;
+        return computeAnalysisClassesInDir(file, basePos);
+      } else {
+        return computeAnalysisClassesInJar(file);
+      }
     } catch (IOException e) {
       e.printStackTrace();
       throw new FatalAnalysisException(e);
@@ -231,13 +239,13 @@ public abstract class Analysis<A extends CommandLineArguments> {
    * @return The set of classes found under the directory.
    * @throws IOException if something goes wrong with the file operations.
    */
-  private Set<String> computeAnalysisClassesHelper(File directory, int basePos) throws IOException {
+  private Set<String> computeAnalysisClassesInDir(File directory, int basePos) throws IOException {
     File[] nestedFilesAndDirs = directory.listFiles();
     Set<String> result = new HashSet<String>();
 
     for (File nestedFile : nestedFilesAndDirs) {
       if (nestedFile.isDirectory()) {
-        result.addAll(computeAnalysisClassesHelper(nestedFile, basePos));
+        result.addAll(computeAnalysisClassesInDir(nestedFile, basePos));
       } else {
         String canonicalPath = nestedFile.getCanonicalPath();
         if (canonicalPath.endsWith(".class")) {
@@ -246,6 +254,34 @@ public abstract class Analysis<A extends CommandLineArguments> {
         }
       }
     }
+
+    return result;
+  }
+
+  /**
+   * Helper for computing the set of classes in a jar file.
+   * 
+   * @param file A {@link java.io.File File} object for the jar in which classes should be searched
+   *          for.
+   * @return The set of classes found in the jar.
+   * @throws IOException if something goes wrong with the file operations.
+   */
+  private Set<String> computeAnalysisClassesInJar(File file) throws IOException {
+    Set<String> result = new HashSet<>();
+
+    JarFile jarFile = new JarFile(file);
+    Enumeration<JarEntry> jarEntries = jarFile.entries();
+
+    while (jarEntries.hasMoreElements()) {
+      JarEntry jarEntry = jarEntries.nextElement();
+      String entryName = jarEntry.getName();
+      if (entryName.endsWith(".class")) {
+        String name = entryName.substring(0, entryName.length() - 6).replace('/', '.');
+        result.add(name);
+      }
+    }
+
+    jarFile.close();
 
     return result;
   }

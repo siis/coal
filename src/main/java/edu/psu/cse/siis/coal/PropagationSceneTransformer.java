@@ -66,7 +66,9 @@ public class PropagationSceneTransformer extends SceneTransformer {
     AnalysisParameters.v().setIcfg(iCfg);
     PropagationProblem problem = new PropagationProblem(iCfg);
     for (SootMethod ep : Scene.v().getEntryPoints()) {
-      problem.getInitialSeeds().add(ep.getActiveBody().getUnits().getFirst());
+      if (ep.isConcrete()) {
+        problem.getInitialSeeds().add(ep.getActiveBody().getUnits().getFirst());
+      }
     }
 
     int iterationCounter = 0;

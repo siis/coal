@@ -234,19 +234,17 @@ public class Model implements Serializable {
   public Argument[] getArgumentsForQuery(Stmt stmt) {
     if (stmt.containsInvokeExpr()) {
       InvokeExpr invokeExpr = stmt.getInvokeExpr();
-      if (invokeExpr instanceof InstanceInvokeExpr) {
-        SootMethod method = invokeExpr.getMethod();
-        if (AnalysisParameters.v().isAnalysisClass(method.getDeclaringClass().getName())
-            && method.isConcrete() && method.hasActiveBody()) {
-          MethodDescription description = queryToMethodDescriptionMap.get(method.getSignature());
-          if (description == null) {
-            return null;
-          } else {
-            return description.getArguments();
-          }
+      SootMethod method = invokeExpr.getMethod();
+      if (AnalysisParameters.v().isAnalysisClass(method.getDeclaringClass().getName())
+          && method.isConcrete() && method.hasActiveBody()) {
+        MethodDescription description = queryToMethodDescriptionMap.get(method.getSignature());
+        if (description == null) {
+          return null;
+        } else {
+          return description.getArguments();
         }
-        return getArgumentsFromMethodDescription(queryToMethodDescriptionMap, invokeExpr);
       }
+      return getArgumentsFromMethodDescription(queryToMethodDescriptionMap, invokeExpr);
     }
     return null;
   }
@@ -289,8 +287,13 @@ public class Model implements Serializable {
       return null;
     }
     SootClass superclass = Scene.v().getSootClass(superclassName);
-    Value baseValue = ((InstanceInvokeExpr) invokeExpr).getBase();
-    String baseType = baseValue.getType().toString();
+    String baseType;
+    if (invokeExpr instanceof InstanceInvokeExpr) {
+      Value baseValue = ((InstanceInvokeExpr) invokeExpr).getBase();
+      baseType = baseValue.getType().toString();
+    } else {
+      baseType = invokeExpr.getMethod().getDeclaringClass().getName();
+    }
     if (Scene.v().containsClass(baseType)
         && Scene.v().getActiveHierarchy()
             .isClassSubclassOfIncluding(Scene.v().getSootClass(baseType), superclass)) {
