@@ -231,7 +231,8 @@
 
   <profiles>
     <profile>
-      <!-- Use mvn clean compile package -P to generate standalone version with proper logging. -->
+      <!-- Use mvn clean compile package -P standalone to generate standalone version with proper
+      logging. -->
       <id>standalone</id>
       <dependencies>
         <dependency>

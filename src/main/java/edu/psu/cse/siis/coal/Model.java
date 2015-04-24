@@ -92,6 +92,27 @@ public class Model implements Serializable {
   }
 
   /**
+   * Loads the model from a sequence of paths, which can either be directories or files. They should
+   * be separated by the platform's path separator (':' in most platforms).
+   * 
+   * @param modelPaths A sequence of paths to model files or directories.
+   * @throws FileNotFoundException if something goes wrong with the file operations.
+   * @throws ParseException if something goes wrong with the parsing process.
+   */
+  public static void loadModel(String modelPaths) throws FileNotFoundException, ParseException {
+    String[] modelPathsParts = modelPaths.split(File.pathSeparator);
+
+    for (String modelPath : modelPathsParts) {
+      File file = new File(modelPath);
+      if (file.isDirectory()) {
+        loadModelFromDirectory(modelPath);
+      } else {
+        loadModelFromFile(modelPath);
+      }
+    }
+  }
+
+  /**
    * Loads the model from a directory containing all COAL specifications for the analysis. The COAL
    * files should all be in that same directory (no subdirectories). This should only be called
    * once, as it calls {@link #endInitialization()}, which prevents any further modification to the
@@ -103,7 +124,9 @@ public class Model implements Serializable {
    */
   public static void loadModelFromDirectory(String modelDir) throws FileNotFoundException,
       ParseException {
-    instance = new Model();
+    if (instance == null) {
+      instance = new Model();
+    }
 
     PropagationParser.parseModelFromDirectory(instance, modelDir);
     instance.endInitialization();
