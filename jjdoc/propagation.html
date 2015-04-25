@@ -29,7 +29,7 @@
    <PRE>
 &lt;DEFAULT&gt; TOKEN : {
 &lt;CLASS: "class"&gt;
-| &lt;SINK: "sink"&gt;
+| &lt;MODIFIER: "mod"&gt;
 | &lt;TYPE: "type"&gt;
 | &lt;ARGUMENT: "argument"&gt;
 | &lt;COPY: "copy"&gt;
@@ -93,7 +93,7 @@
 <TR>
 <TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod4">classDeclaration</A></TD>
 <TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
-<TD ALIGN=LEFT VALIGN=BASELINE>( <A HREF="#prod6">fieldDeclaration</A> | <A HREF="#prod7">argument</A> | <A HREF="#prod8">sink</A> | <A HREF="#prod9">copy</A> | <A HREF="#prod10">superclassDeclaration</A> | <A HREF="#prod11">query</A> | <A HREF="#prod12">exclude</A> | <A HREF="#prod13">source</A> | <A HREF="#prod14">staticField</A> )*</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( <A HREF="#prod6">fieldDeclaration</A> | <A HREF="#prod7">argument</A> | <A HREF="#prod8">modifier</A> | <A HREF="#prod9">copy</A> | <A HREF="#prod10">superclassDeclaration</A> | <A HREF="#prod11">query</A> | <A HREF="#prod12">exclude</A> | <A HREF="#prod13">source</A> | <A HREF="#prod14">staticField</A> )*</TD>
 </TR>
 <TR>
 <TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod6">fieldDeclaration</A></TD>
@@ -221,22 +221,22 @@
 <TD ALIGN=LEFT VALIGN=BASELINE>"(" &lt;INTEGER&gt; ")"</TD>
 </TR>
 <TR>
-<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod8">sink</A></TD>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod8">modifier</A></TD>
 <TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
-<TD ALIGN=LEFT VALIGN=BASELINE>&lt;SINK&gt; <A HREF="#prod37">sinkModifier</A> <A HREF="#prod38">extendedSignature</A> "{" <A HREF="#prod39">sinkOrQueryOrFieldDeclaration</A> "}"</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;MODIFIER&gt; <A HREF="#prod37">modifierModifier</A> <A HREF="#prod38">extendedSignature</A> "{" <A HREF="#prod39">modifierOrQueryOrFieldDeclaration</A> "}"</TD>
 </TR>
 <TR>
-<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod37">sinkModifier</A></TD>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod37">modifierModifier</A></TD>
 <TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
 <TD ALIGN=LEFT VALIGN=BASELINE>( ( &lt;GEN&gt; | &lt;COPY&gt; ) )?</TD>
 </TR>
 <TR>
 <TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod38">extendedSignature</A></TD>
 <TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
-<TD ALIGN=LEFT VALIGN=BASELINE>( <A HREF="#prod40">queryOrSinkSignature</A> | <A HREF="#prod41">superclass</A> &lt;COLON&gt; <A HREF="#prod42">queryShortSignature</A> )</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( <A HREF="#prod40">queryOrModifierSignature</A> | <A HREF="#prod41">superclass</A> &lt;COLON&gt; <A HREF="#prod42">queryShortSignature</A> )</TD>
 </TR>
 <TR>
-<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod39">sinkOrQueryOrFieldDeclaration</A></TD>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod39">modifierOrQueryOrFieldDeclaration</A></TD>
 <TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
 <TD ALIGN=LEFT VALIGN=BASELINE>( ( <A HREF="#prod43">namedArgument</A> | <A HREF="#prod16">argumentDeclaration</A> ) )*</TD>
 </TR>
@@ -248,15 +248,15 @@
 <TR>
 <TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod9">copy</A></TD>
 <TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
-<TD ALIGN=LEFT VALIGN=BASELINE>&lt;COPY&gt; &lt;SIGNATURE&gt; "{" <A HREF="#prod39">sinkOrQueryOrFieldDeclaration</A> "}"</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;COPY&gt; &lt;SIGNATURE&gt; "{" <A HREF="#prod39">modifierOrQueryOrFieldDeclaration</A> "}"</TD>
 </TR>
 <TR>
 <TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod11">query</A></TD>
 <TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
-<TD ALIGN=LEFT VALIGN=BASELINE>&lt;QUERY&gt; <A HREF="#prod38">extendedSignature</A> "{" <A HREF="#prod39">sinkOrQueryOrFieldDeclaration</A> "}"</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;QUERY&gt; <A HREF="#prod38">extendedSignature</A> "{" <A HREF="#prod39">modifierOrQueryOrFieldDeclaration</A> "}"</TD>
 </TR>
 <TR>
-<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod40">queryOrSinkSignature</A></TD>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod40">queryOrModifierSignature</A></TD>
 <TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
 <TD ALIGN=LEFT VALIGN=BASELINE>&lt;SIGNATURE&gt;</TD>
 </TR>
@@ -288,7 +288,7 @@
 <TR>
 <TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod13">source</A></TD>
 <TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
-<TD ALIGN=LEFT VALIGN=BASELINE>&lt;SOURCE&gt; &lt;SIGNATURE&gt; "{" <A HREF="#prod39">sinkOrQueryOrFieldDeclaration</A> "}"</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;SOURCE&gt; &lt;SIGNATURE&gt; "{" <A HREF="#prod39">modifierOrQueryOrFieldDeclaration</A> "}"</TD>
 </TR>
 <TR>
 <TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod14">staticField</A></TD>
@@ -303,7 +303,7 @@
 <TR>
 <TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod46">extendedStaticField</A></TD>
 <TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
-<TD ALIGN=LEFT VALIGN=BASELINE>&lt;STATIC_FIELD_SIGNATURE&gt; "{" <A HREF="#prod39">sinkOrQueryOrFieldDeclaration</A> "}"</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;STATIC_FIELD_SIGNATURE&gt; "{" <A HREF="#prod39">modifierOrQueryOrFieldDeclaration</A> "}"</TD>
 </TR>
 </TABLE>
 </BODY>
