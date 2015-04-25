@@ -24,7 +24,7 @@
   <name>The COAL Solver</name>
   <groupId>edu.psu.cse.siis</groupId>
   <artifactId>coal</artifactId>
-  <version>0.1.2-SNAPSHOT</version>
+  <version>0.1.2</version>
   <url>http://siis.cse.psu.edu/coal/</url>
 
   <organization>
