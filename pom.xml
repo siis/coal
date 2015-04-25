@@ -44,19 +44,22 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
   </properties>
 
-  <distributionManagement>
-    <repository>
-      <id>internal.repo</id>
-        <name>Temporary Staging Repository</name>
-        <url>file://${project.build.directory}/mvn-repo</url>
-    </repository>
-  </distributionManagement>
-
   <scm>
     <connection>scm:git:https://github.com/siis/coal.git</connection>
     <developerConnection>scm:git:git@github.com:siis/coal.git</developerConnection>
     <url>https://github.com/siis/coal</url>
   </scm>
+
+  <distributionManagement>
+    <snapshotRepository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
+    <repository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+    </repository>
+  </distributionManagement>
 
   <build>
     <plugins>
@@ -122,21 +125,6 @@
       	<version>0.11</version>
         <executions>
           <execution>
-            <id>maven-repo</id>
-            <goals><goal>site</goal></goals>
-            <phase>deploy</phase>
-            <configuration>
-              <server>github</server>
-              <message>Maven artifacts for ${project.version}</message>  <!-- git commit message -->
-              <noJekyll>true</noJekyll>                                  <!-- disable webpage processing -->
-              <outputDirectory>${project.build.directory}/mvn-repo</outputDirectory> <!-- matches distribution management repository url above -->
-              <branch>refs/heads/mvn-repo</branch>                       <!-- remote branch name -->
-              <includes><include>**/*</include></includes>
-              <repositoryName>coal</repositoryName>      <!-- github repo name -->
-              <repositoryOwner>siis</repositoryOwner>    <!-- github username  -->
-            </configuration>
-          </execution>
-          <execution>
             <id>javadoc-jjdoc</id>
             <goals><goal>site</goal></goals>
             <phase>site</phase>
@@ -155,14 +143,6 @@
             </configuration>
           </execution>
         </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-deploy-plugin</artifactId>
-        <version>2.8.2</version>
-        <configuration>
-          <altDeploymentRepository>internal.repo::default::file://${project.build.directory}/mvn-repo</altDeploymentRepository>
-        </configuration>
       </plugin>
     </plugins>
 
