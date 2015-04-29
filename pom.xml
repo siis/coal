@@ -369,6 +369,16 @@
             </configuration>
           </plugin>
         </plugins>
+
+        <resources>
+          <resource>
+            <directory>src/main/resources</directory>
+            <excludes>
+              <exclude>log4j.properties</exclude>
+            </excludes>
+            <filtering>false</filtering>
+          </resource>
+        </resources>
       </build>
     </profile>
   </profiles>
