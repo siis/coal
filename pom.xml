@@ -81,32 +81,6 @@
         </configuration>
       </plugin>
       <plugin>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <version>2.5.3</version>
-        <configuration>
-          <archive>
-            <manifest>
-              <mainClass>edu.psu.cse.siis.coal.Main</mainClass>
-            </manifest>
-          </archive>
-          <descriptorRefs>
-            <descriptorRef>jar-with-dependencies</descriptorRef>
-          </descriptorRefs>
-          <appendAssemblyId>false</appendAssemblyId>
-          <finalName>coal-api-${project.version}</finalName>
-        </configuration>
-        <executions>
-          <execution>
-            <!-- Automatically package everything during install or deploy phases. -->
-            <id>make-assembly</id>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
       	<groupId>org.apache.maven.plugins</groupId>
       	<artifactId>maven-javadoc-plugin</artifactId>
       	<version>2.9.1</version>
@@ -266,7 +240,7 @@
                 <descriptorRef>jar-with-dependencies</descriptorRef>
               </descriptorRefs>
               <appendAssemblyId>false</appendAssemblyId>
-              <finalName>coal-${project.version}</finalName>
+              <finalName>coal-all-${project.version}</finalName>
             </configuration>
             <executions>
               <execution>
@@ -287,33 +261,6 @@
       <id>release</id>
       <build>
         <plugins>
-          <plugin>
-            <artifactId>maven-assembly-plugin</artifactId>
-            <version>2.5.3</version>
-            <configuration>
-              <archive>
-                <manifest>
-                  <mainClass>edu.psu.cse.siis.coal.Main</mainClass>
-                </manifest>
-              </archive>
-              <descriptorRefs>
-                <descriptorRef>jar-with-dependencies</descriptorRef>
-              </descriptorRefs>
-              <appendAssemblyId>false</appendAssemblyId>
-              <finalName>coal-api-${project.version}</finalName>
-            </configuration>
-            <executions>
-              <execution>
-                <!-- Automatically package everything during install or deploy phases. -->
-                <id>make-assembly</id>
-                <phase>package</phase>
-                <goals>
-                  <goal>single</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-source-plugin</artifactId>
@@ -369,16 +316,6 @@
             </configuration>
           </plugin>
         </plugins>
-
-        <resources>
-          <resource>
-            <directory>src/main/resources</directory>
-            <excludes>
-              <exclude>log4j.properties</exclude>
-            </excludes>
-            <filtering>false</filtering>
-          </resource>
-        </resources>
       </build>
     </profile>
   </profiles>
@@ -409,6 +346,7 @@
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.11</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 
