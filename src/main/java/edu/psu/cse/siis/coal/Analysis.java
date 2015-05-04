@@ -88,8 +88,10 @@ public abstract class Analysis<A extends CommandLineArguments> {
     try {
       if (commanLineArguments.getCompiledModel() != null) {
         Model.loadModelFromCompiledFile(commanLineArguments.getCompiledModel());
-      } else {
+      } else if (commanLineArguments.getModel() != null) {
         Model.loadModel(commanLineArguments.getModel());
+      } else {
+        throw new FatalAnalysisException("No model file or directory was specified");
       }
     } catch (ClassNotFoundException | IOException | ParseException e) {
       throw new FatalAnalysisException("Could not load model", e);
