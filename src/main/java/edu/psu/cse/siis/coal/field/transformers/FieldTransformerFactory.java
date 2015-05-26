@@ -34,7 +34,7 @@ public abstract class FieldTransformerFactory {
    * @param value An argument value.
    * @return A field transformer.
    */
-  FieldTransformer makeFieldTransformer(Object value) {
+  public FieldTransformer makeFieldTransformer(Object value) {
     throw new RuntimeException("makeFieldTransformer(value) not implemented in factory "
         + this.getClass().toString());
   }
@@ -49,7 +49,7 @@ public abstract class FieldTransformerFactory {
    * @param op An operation to be performed on a field.
    * @return A field transformer.
    */
-  FieldTransformer makeFieldTransformer(Value symbol, Stmt stmt, String op) {
+  public FieldTransformer makeFieldTransformer(Value symbol, Stmt stmt, String op) {
     throw new RuntimeException("makeFieldTransformer(symbol, stmt) not implemented in factory "
         + this.getClass().toString());
   }

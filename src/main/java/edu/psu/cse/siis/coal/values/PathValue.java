@@ -30,6 +30,9 @@ import java.util.Set;
 import edu.psu.cse.siis.coal.PropagationSolver;
 import edu.psu.cse.siis.coal.field.values.FieldValue;
 import edu.psu.cse.siis.coal.field.values.IntermediateFieldValue;
+import edu.psu.cse.siis.coal.field.values.NullFieldValue;
+import edu.psu.cse.siis.coal.field.values.ScalarFieldValue;
+import edu.psu.cse.siis.coal.field.values.SetFieldValue;
 
 /**
  * A COAL value for a single execution path. This is essentially a collection of field values.
@@ -69,23 +72,30 @@ public class PathValue {
   }
 
   /**
-   * Returns the value of a field converted to a specific type.
+   * Returns the value of a field converted to a specific set type.
    * 
    * @param field The name of the field whose value should be returned.
    * @param type The type to which the field value should be converted.
    * @return The field value.
    */
   @SuppressWarnings("unchecked")
-  public <T> Set<T> getFieldValue(String field, Class<T> type) {
+  public <T> Set<T> getSetFieldValue(String field, Class<T> type) {
     FieldValue fieldValue = this.fieldMap.get(field);
-    if (fieldValue == null || fieldValue.getValues() == null) {
+    if (fieldValue == null || fieldValue == NullFieldValue.v()) {
       return null;
     }
-    Set<T> result = new HashSet<>();
-    for (Object value : fieldValue.getValues()) {
-      result.add((T) value);
+
+    if (fieldValue instanceof SetFieldValue) {
+      SetFieldValue setFieldValue = (SetFieldValue) fieldValue;
+      Set<T> result = new HashSet<>();
+      for (Object value : (Set<Object>) setFieldValue.getValue()) {
+        result.add((T) value);
+      }
+      return result;
+    } else {
+      throw new RuntimeException("Could not apply getScalarFieldValue to non-scalar type "
+          + this.getClass());
     }
-    return result;
   }
 
   /**
@@ -94,8 +104,8 @@ public class PathValue {
    * @param field The name of the field whose value should be returned.
    * @return The field value.
    */
-  public Set<String> getStringFieldValue(String field) {
-    return getFieldValue(field, String.class);
+  public Set<String> getSetStringFieldValue(String field) {
+    return getSetFieldValue(field, String.class);
   }
 
   /**
@@ -106,41 +116,42 @@ public class PathValue {
    * @return True if there is a field by the name indicated that is not null.
    */
   public boolean containsNonNullFieldValue(String field) {
-    if (!fieldMap.containsKey(field)) {
-      return false;
-    }
     FieldValue fieldValue = fieldMap.get(field);
-    if (fieldValue == null) {
-      return false;
-    }
-    Set<Object> values = fieldValue.getValues();
-    return values != null && values.size() != 0;
+    return fieldValue != null && fieldValue != NullFieldValue.v();
   }
 
   /**
-   * Get a single string value for a given field. Only use this method if you are sure that a field
-   * cannot have a set of more than one value.
+   * Gets a single scalar value for a given field. Only use this method for a scalar field value.
+   * 
+   * @param field A field name.
+   * @param type The type of the field.
+   * @return The single field value, or null if the field has no value.
+   * @throws RuntimeException if the field is not a scalar of the specified type.
+   */
+  public <T> T getScalarFieldValue(String field, Class<T> type) {
+    FieldValue fieldValue = this.fieldMap.get(field);
+    if (fieldValue == null || fieldValue == NullFieldValue.v()) {
+      return null;
+    }
+
+    if (fieldValue instanceof ScalarFieldValue) {
+      return ((ScalarFieldValue) fieldValue).getFieldValue(type);
+    } else {
+      throw new RuntimeException("Could not apply getScalarFieldValue to non-scalar type "
+          + this.getClass());
+    }
+  }
+
+  /**
+   * Gets a single string value for a given field. Only use this method for a scalar field value of
+   * type String.
    * 
    * @param field A field name.
    * @return The single string value, or null if the field has no value.
-   * @throws RuntimeException if the field has more than one value.
+   * @throws RuntimeException if the field is not a scalar String type.
    */
-  public String getSingleStringFieldValue(String field) {
-    FieldValue fieldValue = this.fieldMap.get(field);
-    if (fieldValue == null) {
-      return null;
-    }
-
-    Set<Object> values = fieldValue.getValues();
-    if (values == null) {
-      return null;
-    }
-
-    if (values.size() != 1) {
-      throw new RuntimeException("More than one string value for field " + field);
-    }
-
-    return (String) values.iterator().next();
+  public String getScalarStringFieldValue(String field) {
+    return getScalarFieldValue(field, String.class);
   }
 
   /**
@@ -248,7 +259,7 @@ public class PathValue {
     for (Map.Entry<String, FieldValue> entry : this.fieldMap.entrySet()) {
       FieldValue value = entry.getValue();
       String valueString = value == null ? "null" : value.toString();
-      parts.add(entry.getKey() + "=" + valueString + ",");
+      parts.add(entry.getKey() + "=" + valueString + ", ");
     }
     Collections.sort(parts);
 

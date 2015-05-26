@@ -72,7 +72,6 @@ public class ArgumentValueManager {
    */
   public void registerArgumentValueAnalysis(String type, ArgumentValueAnalysis analysis) {
     argumentValueAnalysisMap.put(type, analysis);
-    topFieldTransformerMap.put(type, makeTopFieldTransformer(type));
   }
 
   /**
@@ -80,9 +79,16 @@ public class ArgumentValueManager {
    * solver.
    */
   public void registerDefaultArgumentValueAnalyses() {
-    registerArgumentValueAnalysis(Constants.DefaultArgumentTypes.STRING, new StringValueAnalysis());
-    registerArgumentValueAnalysis(Constants.DefaultArgumentTypes.CLASS, new ClassValueAnalysis());
-    registerArgumentValueAnalysis(Constants.DefaultArgumentTypes.INT, new IntValueAnalysis());
+    registerArgumentValueAnalysis(Constants.DefaultArgumentTypes.Scalar.STRING,
+        new StringValueAnalysis());
+    registerArgumentValueAnalysis(Constants.DefaultArgumentTypes.Scalar.CLASS,
+        new ClassValueAnalysis());
+    registerArgumentValueAnalysis(Constants.DefaultArgumentTypes.Scalar.INT, new IntValueAnalysis());
+    registerArgumentValueAnalysis(Constants.DefaultArgumentTypes.Set.STRING,
+        new StringValueAnalysis());
+    registerArgumentValueAnalysis(Constants.DefaultArgumentTypes.Set.CLASS,
+        new ClassValueAnalysis());
+    registerArgumentValueAnalysis(Constants.DefaultArgumentTypes.Set.INT, new IntValueAnalysis());
   }
 
   /**
@@ -121,15 +127,17 @@ public class ArgumentValueManager {
    * @param type An argument type.
    * @return A field transformer.
    */
-  public FieldTransformer getTopFieldTransformer(String type) {
+  public FieldTransformer getTopFieldTransformer(String type, String operation) {
     ArgumentValueAnalysis analysis = argumentValueAnalysisMap.get(type);
     if (analysis == null) {
       throw new RuntimeException("No analysis for type " + type);
     }
 
-    FieldTransformer fieldTransformer = topFieldTransformerMap.get(type);
+    String key = new StringBuilder(type).append("::").append(operation).toString();
+    FieldTransformer fieldTransformer = topFieldTransformerMap.get(key);
     if (fieldTransformer == null) {
-      throw new RuntimeException("No top field transformer defined for type " + type);
+      fieldTransformer = makeTopFieldTransformer(type, operation);
+      topFieldTransformerMap.put(key, fieldTransformer);
     }
     return fieldTransformer;
   }
@@ -140,14 +148,13 @@ public class ArgumentValueManager {
    * @param type A field type.
    * @return An field transformer.
    */
-  private FieldTransformer makeTopFieldTransformer(String type) {
+  private FieldTransformer makeTopFieldTransformer(String type, String operation) {
     ArgumentValueAnalysis analysis = argumentValueAnalysisMap.get(type);
     if (analysis == null) {
       throw new RuntimeException("No analysis for type " + type);
     }
 
-    return FieldTransformerManager.v().makeFieldTransformer(Constants.DefaultActions.REPLACE,
-        analysis.getTopValue());
+    return FieldTransformerManager.v().makeFieldTransformer(operation, analysis.getTopValue());
   }
 
   /**

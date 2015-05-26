@@ -18,7 +18,6 @@
  */
 package edu.psu.cse.siis.coal.field.values;
 
-import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -84,31 +83,33 @@ public class IntermediateFieldValue extends FieldValue {
    * @return The equivalent field values without references to other COAL field values.
    */
   public Set<FieldValue> makeFinalFieldValues(String field, PropagationSolver solver) {
-    Set<FieldValue> result = new HashSet<>();
+    throw new RuntimeException("Not implemented for this version yet!");
 
-    Set<FieldTransformer> sequenceTransformers =
-        this.transformerSequence.makeFinalFieldTransformers(field, solver);
-    for (FieldTransformer sequenceTransformer : sequenceTransformers) {
-      // This copy constructor does not copy the transformer sequence.
-      FieldValue currentFieldValue = new FieldValue(this);
-      if (sequenceTransformer != null) {
-        result.add(sequenceTransformer.apply(currentFieldValue));
-      } else {
-        result.add(currentFieldValue);
-      }
-    }
-
-    return result;
+    // Set<FieldValue> result = new HashSet<>();
+    //
+    // Set<FieldTransformer> sequenceTransformers =
+    // this.transformerSequence.makeFinalFieldTransformers(field, solver);
+    // for (FieldTransformer sequenceTransformer : sequenceTransformers) {
+    // // This copy constructor does not copy the transformer sequence.
+    // FieldValue currentFieldValue = new FieldValue(this);
+    // if (sequenceTransformer != null) {
+    // result.add(sequenceTransformer.apply(currentFieldValue));
+    // } else {
+    // result.add(currentFieldValue);
+    // }
+    // }
+    //
+    // return result;
   }
 
   @Override
   public String toString() {
-    return "values " + this.getValues() + ", transformer sequence " + this.transformerSequence;
+    return "values " + this.getValue() + ", transformer sequence " + this.transformerSequence;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(getValues(), transformerSequence);
+    return Objects.hash(getValue(), transformerSequence);
   }
 
   @Override
@@ -117,7 +118,12 @@ public class IntermediateFieldValue extends FieldValue {
       return false;
     }
     IntermediateFieldValue secondFieldValue = (IntermediateFieldValue) other;
-    return Objects.equals(this.getValues(), secondFieldValue.getValues())
+    return Objects.equals(this.getValue(), secondFieldValue.getValue())
         && Objects.equals(this.transformerSequence, secondFieldValue.transformerSequence);
+  }
+
+  @Override
+  public Object getValue() {
+    throw new RuntimeException("Not implemented");
   }
 }

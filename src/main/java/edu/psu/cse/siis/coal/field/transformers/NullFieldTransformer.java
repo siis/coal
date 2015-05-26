@@ -18,15 +18,27 @@
  */
 package edu.psu.cse.siis.coal.field.transformers;
 
-import java.util.HashSet;
+import edu.psu.cse.siis.coal.field.values.FieldValue;
+import edu.psu.cse.siis.coal.field.values.NullFieldValue;
 
 /**
- * A field transformer for replace operations.
+ * A {@link FieldTransformer} that replaces values with null. This can be applied to any field type.
  */
-public class Replace extends FieldTransformer {
-  public Replace(Object value) {
-    this.clear = true;
-    this.add = new HashSet<>(2);
-    this.add.add(value);
+public class NullFieldTransformer extends FieldTransformer {
+  private static NullFieldTransformer instance = new NullFieldTransformer();
+
+  private NullFieldTransformer() {
+  }
+
+  public static NullFieldTransformer v() {
+    return instance;
+  }
+
+  public FieldValue apply(FieldValue fieldValue) {
+    return NullFieldValue.v();
+  }
+
+  public FieldTransformer compose(FieldTransformer secondFieldTransformer) {
+    return secondFieldTransformer;
   }
 }

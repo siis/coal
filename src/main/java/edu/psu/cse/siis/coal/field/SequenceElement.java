@@ -29,7 +29,6 @@ import soot.Value;
 import soot.jimple.Stmt;
 import edu.psu.cse.siis.coal.PropagationSolver;
 import edu.psu.cse.siis.coal.field.transformers.FieldTransformer;
-import edu.psu.cse.siis.coal.field.transformers.FieldTransformerUtils;
 import edu.psu.cse.siis.coal.field.transformers.IdentityFieldTransformer;
 
 /**
@@ -93,8 +92,9 @@ public class SequenceElement {
       logger.debug("Making transformer from element " + this.toString());
     }
 
-    return FieldTransformerUtils.makeTransformersFromReferencedValue(stmt, symbol, field, null,
-        solver, op, new Boolean[1]);
+    throw new RuntimeException("Not implemented in this version.");
+    // return FieldTransformerUtils.makeTransformersFromReferencedValue(stmt, symbol, field, null,
+    // solver, op, new Boolean[1]);
   }
 
   @Override

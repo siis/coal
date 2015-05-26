@@ -18,14 +18,20 @@
  */
 package edu.psu.cse.siis.coal.field.transformers;
 
-/**
- * A factory for add field transformers.
- */
-public class FieldAddTransformerFactory extends FieldTransformerFactory {
+import soot.Value;
+import soot.jimple.Stmt;
 
+/**
+ * A factory for {@link NullFieldTransformer}, which always returns the same singleton.
+ */
+public class FieldNullTransformerFactory extends FieldTransformerFactory {
   @Override
-  FieldTransformer makeFieldTransformer(Object value) {
-    return new Add(value);
+  public FieldTransformer makeFieldTransformer(Object value) {
+    return NullFieldTransformer.v();
   }
 
+  @Override
+  public FieldTransformer makeFieldTransformer(Value symbol, Stmt stmt, String op) {
+    return NullFieldTransformer.v();
+  }
 }

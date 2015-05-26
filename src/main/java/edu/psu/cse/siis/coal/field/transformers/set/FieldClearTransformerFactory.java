@@ -16,16 +16,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package edu.psu.cse.siis.coal.field.transformers;
+package edu.psu.cse.siis.coal.field.transformers.set;
+
+import edu.psu.cse.siis.coal.field.transformers.FieldTransformer;
+import edu.psu.cse.siis.coal.field.transformers.FieldTransformerFactory;
 
 /**
- * A factory for replace field transformers.
+ * A factory for clear field transformers.
  */
-public class FieldReplaceTransformerFactory extends FieldTransformerFactory {
+public class FieldClearTransformerFactory extends FieldTransformerFactory {
 
   @Override
-  FieldTransformer makeFieldTransformer(Object value) {
-    return new Replace(value);
+  public FieldTransformer makeFieldTransformer(Object value) {
+    return Clear.v();
   }
 
 }

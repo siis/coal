@@ -16,34 +16,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package edu.psu.cse.siis.coal.field.values;
+package edu.psu.cse.siis.coal.field.transformers.set;
 
+import edu.psu.cse.siis.coal.field.transformers.FieldTransformer;
+import edu.psu.cse.siis.coal.field.transformers.FieldTransformerFactory;
 
 /**
- * An unknown field value. This is a singleton.
+ * A factory for remove field transformers.
  */
-public class TopFieldValue extends FieldValue {
-  private static final TopFieldValue instance = new TopFieldValue();
-
-  private TopFieldValue() {
-  }
-
-  /**
-   * Returns the singleton instance for this class.
-   * 
-   * @return The singleton instance for this class.
-   */
-  public static TopFieldValue v() {
-    return instance;
-  }
+public class FieldRemoveTransformerFactory extends FieldTransformerFactory {
 
   @Override
-  public String toString() {
-    return "top";
+  public FieldTransformer makeFieldTransformer(Object value) {
+    return new Remove(value);
   }
 
-  @Override
-  public Object getValue() {
-    throw new RuntimeException("Cannot get value for top field value");
-  }
 }

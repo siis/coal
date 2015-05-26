@@ -16,30 +16,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package edu.psu.cse.siis.coal.field.transformers;
+package edu.psu.cse.siis.coal.field.transformers.set;
 
-import java.util.HashSet;
+import edu.psu.cse.siis.coal.field.transformers.FieldTransformer;
+import edu.psu.cse.siis.coal.field.transformers.FieldTransformerFactory;
 
 /**
- * A field transformer for remove operations;
+ * A factory for replace field transformers.
  */
-public class Remove extends FieldTransformer {
-  public Remove(Object value) {
-    this.remove = new HashSet<>(2);
-    this.remove.add(value);
-  }
-
-  public Remove(Remove remove1, Remove remove2) {
-    this.remove = new HashSet<>(remove1.remove);
-    this.remove.addAll(remove2.remove);
-  }
+public class FieldReplaceTransformerFactory extends FieldTransformerFactory {
 
   @Override
-  public FieldTransformer compose(FieldTransformer secondFieldOperation) {
-    if (secondFieldOperation instanceof Remove) {
-      return new Remove(this, (Remove) secondFieldOperation);
-    } else {
-      return super.compose(secondFieldOperation);
-    }
+  public FieldTransformer makeFieldTransformer(Object value) {
+    return new Replace(value);
   }
+
 }

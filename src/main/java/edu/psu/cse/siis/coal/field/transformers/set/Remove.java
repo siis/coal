@@ -16,34 +16,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package edu.psu.cse.siis.coal.field.values;
+package edu.psu.cse.siis.coal.field.transformers.set;
 
+import java.util.HashSet;
+
+import edu.psu.cse.siis.coal.field.transformers.FieldTransformer;
 
 /**
- * An unknown field value. This is a singleton.
+ * A field transformer for remove operations;
  */
-public class TopFieldValue extends FieldValue {
-  private static final TopFieldValue instance = new TopFieldValue();
-
-  private TopFieldValue() {
+public class Remove extends SetFieldTransformer {
+  public Remove(Object value) {
+    this.remove = new HashSet<>(2);
+    this.remove.add(value);
   }
 
-  /**
-   * Returns the singleton instance for this class.
-   * 
-   * @return The singleton instance for this class.
-   */
-  public static TopFieldValue v() {
-    return instance;
+  public Remove(Remove remove1, Remove remove2) {
+    this.remove = new HashSet<>(remove1.remove);
+    this.remove.addAll(remove2.remove);
   }
 
   @Override
-  public String toString() {
-    return "top";
-  }
-
-  @Override
-  public Object getValue() {
-    throw new RuntimeException("Cannot get value for top field value");
+  public FieldTransformer compose(FieldTransformer secondFieldOperation) {
+    if (secondFieldOperation instanceof Remove) {
+      return new Remove(this, (Remove) secondFieldOperation);
+    } else {
+      return super.compose(secondFieldOperation);
+    }
   }
 }

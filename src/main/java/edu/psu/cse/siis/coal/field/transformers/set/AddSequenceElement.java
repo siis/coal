@@ -16,26 +16,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package edu.psu.cse.siis.coal;
-
-import java.util.ArrayList;
-import java.util.List;
+package edu.psu.cse.siis.coal.field.transformers.set;
 
 import soot.Value;
 import soot.jimple.Stmt;
 import edu.psu.cse.siis.coal.field.SequenceElement;
 import edu.psu.cse.siis.coal.field.TransformerSequence;
-import edu.psu.cse.siis.coal.field.transformers.set.Add;
-import edu.psu.cse.siis.coal.field.transformers.set.Remove;
+import edu.psu.cse.siis.coal.field.transformers.FieldTransformer;
 
-public class Utils {
-  public static TransformerSequence makeTransformerSequence(Value value, Stmt stmt) {
-    List<SequenceElement> sequenceElements = new ArrayList<>();
-    sequenceElements.add(new SequenceElement(value, stmt, Constants.DefaultActions.Set.ADD));
-    TransformerSequence transformerSequence = new TransformerSequence(sequenceElements);
-    transformerSequence.addTransformerToSequence(new Add("testComposedAddValue"));
-    transformerSequence.addTransformerToSequence(new Remove("testComposedRemoveValue"));
+/**
+ * A {@link FieldTransformer} for adding a {@link SequenceElement}.
+ */
+public class AddSequenceElement extends SetFieldTransformer {
 
-    return transformerSequence;
+  public AddSequenceElement(Value symbol, Stmt stmt, String op) {
+    this.transformerSequence = new TransformerSequence();
+    this.transformerSequence.addElementToSequence(symbol, stmt, op);
   }
+
 }

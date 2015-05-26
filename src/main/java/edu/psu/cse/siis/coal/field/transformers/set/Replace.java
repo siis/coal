@@ -16,21 +16,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package edu.psu.cse.siis.coal.field.transformers;
+package edu.psu.cse.siis.coal.field.transformers.set;
 
-import soot.Value;
-import soot.jimple.Stmt;
-import edu.psu.cse.siis.coal.field.SequenceElement;
-import edu.psu.cse.siis.coal.field.TransformerSequence;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
- * A {@link FieldTransformer} for adding a {@link SequenceElement}.
+ * A field transformer for replace operations.
  */
-public class AddSequenceElement extends FieldTransformer {
-
-  public AddSequenceElement(Value symbol, Stmt stmt, String op) {
-    this.transformerSequence = new TransformerSequence();
-    this.transformerSequence.addElementToSequence(symbol, stmt, op);
+public class Replace extends SetFieldTransformer {
+  @SuppressWarnings("unchecked")
+  public Replace(Object value) {
+    this.clear = true;
+    this.add = new HashSet<>(2);
+    if (value instanceof Set) {
+      this.add.add((Set<Object>) value);
+    } else {
+      this.add.add(value);
+    }
   }
-
 }

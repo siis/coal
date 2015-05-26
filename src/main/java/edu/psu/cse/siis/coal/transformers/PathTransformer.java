@@ -26,6 +26,7 @@ import edu.psu.cse.siis.coal.Internable;
 import edu.psu.cse.siis.coal.Pool;
 import edu.psu.cse.siis.coal.field.transformers.FieldTransformer;
 import edu.psu.cse.siis.coal.field.values.FieldValue;
+import edu.psu.cse.siis.coal.field.values.NullFieldValue;
 import edu.psu.cse.siis.coal.values.PathValue;
 
 /**
@@ -67,7 +68,7 @@ public class PathTransformer implements Internable<PathTransformer> {
       FieldValue fieldValue = secondFieldMap.get(field);
 
       if (fieldValue == null) {
-        fieldValue = new FieldValue();
+        fieldValue = NullFieldValue.v();
       }
 
       if (fieldTransformer != null) {

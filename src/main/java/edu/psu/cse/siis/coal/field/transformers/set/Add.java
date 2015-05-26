@@ -16,18 +16,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package edu.psu.cse.siis.coal.field.transformers;
+package edu.psu.cse.siis.coal.field.transformers.set;
 
 import java.util.HashSet;
+import java.util.Set;
+
+import edu.psu.cse.siis.coal.field.transformers.FieldTransformer;
 
 /**
  * A {@link FieldTransformer} for an add operation.
  */
-public class Add extends FieldTransformer {
+public class Add extends SetFieldTransformer {
 
+  @SuppressWarnings("unchecked")
   public Add(Object value) {
     this.add = new HashSet<>(2);
-    this.add.add(value);
+    if (value instanceof Set) {
+      this.add.addAll((Set<Object>) value);
+    } else {
+      this.add.add(value);
+    }
   }
 
   private Add(Add add1, Add add2) {

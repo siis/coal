@@ -24,6 +24,12 @@ import java.util.Map;
 import soot.Value;
 import soot.jimple.Stmt;
 import edu.psu.cse.siis.coal.Constants;
+import edu.psu.cse.siis.coal.field.transformers.scalar.FieldScalarReplaceTransformerFactory;
+import edu.psu.cse.siis.coal.field.transformers.set.FieldAddSequenceElementTransformerFactory;
+import edu.psu.cse.siis.coal.field.transformers.set.FieldAddTransformerFactory;
+import edu.psu.cse.siis.coal.field.transformers.set.FieldClearTransformerFactory;
+import edu.psu.cse.siis.coal.field.transformers.set.FieldRemoveTransformerFactory;
+import edu.psu.cse.siis.coal.field.transformers.set.FieldReplaceTransformerFactory;
 
 /**
  * A manager singleton for field transformers, which is the entry point for generating field
@@ -62,15 +68,22 @@ public class FieldTransformerManager {
    * composition.
    */
   public void registerDefaultFieldTransformerFactories() {
-    registerFieldTransformerFactory(Constants.DefaultActions.ADD, new FieldAddTransformerFactory());
-    registerFieldTransformerFactory(Constants.DefaultActions.REMOVE,
+    registerFieldTransformerFactory(Constants.DefaultActions.Set.ADD,
+        new FieldAddTransformerFactory());
+    registerFieldTransformerFactory(Constants.DefaultActions.Set.ADD_ALL,
+        new FieldAddTransformerFactory());
+    registerFieldTransformerFactory(Constants.DefaultActions.Set.REMOVE,
         new FieldRemoveTransformerFactory());
-    registerFieldTransformerFactory(Constants.DefaultActions.CLEAR,
+    registerFieldTransformerFactory(Constants.DefaultActions.Set.CLEAR,
         new FieldClearTransformerFactory());
-    registerFieldTransformerFactory(Constants.DefaultActions.REPLACE,
+    registerFieldTransformerFactory(Constants.DefaultActions.Set.REPLACE_ALL,
         new FieldReplaceTransformerFactory());
     registerFieldTransformerFactory(Constants.DefaultActions.COMPOSE,
         new FieldAddSequenceElementTransformerFactory());
+    registerFieldTransformerFactory(Constants.DefaultActions.Scalar.NULL,
+        new FieldNullTransformerFactory());
+    registerFieldTransformerFactory(Constants.DefaultActions.Scalar.REPLACE,
+        new FieldScalarReplaceTransformerFactory());
   }
 
   /**

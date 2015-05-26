@@ -16,16 +16,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package edu.psu.cse.siis.coal.field.transformers;
+package edu.psu.cse.siis.coal.field.values;
 
-/**
- * A factory for remove field transformers.
- */
-public class FieldRemoveTransformerFactory extends FieldTransformerFactory {
 
-  @Override
-  FieldTransformer makeFieldTransformer(Object value) {
-    return new Remove(value);
+public class NullFieldValue extends FieldValue {
+  private static NullFieldValue instance = new NullFieldValue();
+
+  private NullFieldValue() {
   }
 
+  public static NullFieldValue v() {
+    return instance;
+  }
+
+  @Override
+  public Object getValue() {
+    return null;
+  }
+
+  @Override
+  public String toString() {
+    return "null";
+  }
 }

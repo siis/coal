@@ -34,6 +34,7 @@ import edu.psu.cse.siis.coal.Pool;
 import edu.psu.cse.siis.coal.PropagationSolver;
 import edu.psu.cse.siis.coal.field.values.FieldValue;
 import edu.psu.cse.siis.coal.field.values.IntermediateFieldValue;
+import edu.psu.cse.siis.coal.field.values.NullFieldValue;
 
 /**
  * A COAL propagation value, which is simply a collection of {@link PathValue} elements.
@@ -75,8 +76,7 @@ public class PropagationValue implements BasePropagationValue, Internable<Propag
     Set<FieldValue> result = new HashSet<>();
     for (PathValue pathValue : this.pathValues) {
       if (pathValue == NullPathValue.v()) {
-        FieldValue nullFieldValue = new FieldValue();
-        nullFieldValue.addAll(Collections.singleton((Object) "NULL-CONSTANT"));
+        FieldValue nullFieldValue = NullFieldValue.v();
         result.add(nullFieldValue);
       } else {
         result.add(pathValue.getFieldMap().get(field));

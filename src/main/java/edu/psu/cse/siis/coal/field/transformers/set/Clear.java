@@ -16,16 +16,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package edu.psu.cse.siis.coal.field.transformers;
+package edu.psu.cse.siis.coal.field.transformers.set;
+
+import edu.psu.cse.siis.coal.field.transformers.FieldTransformer;
 
 /**
- * A factory for clear field transformers.
+ * A {@link FieldTransformer} for clear operations. This is a singleton, since all clear field
+ * transformers have the same parameters.
  */
-public class FieldClearTransformerFactory extends FieldTransformerFactory {
+public class Clear extends SetFieldTransformer {
+  private static final Clear instance = new Clear();
 
-  @Override
-  FieldTransformer makeFieldTransformer(Object value) {
-    return Clear.v();
+  public static Clear v() {
+    return instance;
   }
 
+  @Override
+  public FieldTransformer compose(FieldTransformer secondFieldOperation) {
+    if (secondFieldOperation instanceof Clear) {
+      return this;
+    } else {
+      return super.compose(secondFieldOperation);
+    }
+  }
+
+  private Clear() {
+    this.clear = true;
+  }
 }

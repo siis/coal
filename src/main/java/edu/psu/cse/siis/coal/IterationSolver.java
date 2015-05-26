@@ -32,7 +32,11 @@ import com.google.common.base.Objects;
 
 import edu.psu.cse.siis.coal.arguments.ArgumentValueManager;
 import edu.psu.cse.siis.coal.field.transformers.FieldTransformer;
-import edu.psu.cse.siis.coal.field.transformers.FieldTransformerUtils;
+import edu.psu.cse.siis.coal.field.transformers.FieldTransformerManager;
+import edu.psu.cse.siis.coal.field.values.FieldValue;
+import edu.psu.cse.siis.coal.values.BasePropagationValue;
+import edu.psu.cse.siis.coal.values.PropagationValue;
+import edu.psu.cse.siis.coal.values.TopPropagationValue;
 
 /**
  * Singleton for managing iterations of the IDE analysis.
@@ -125,28 +129,43 @@ public class IterationSolver {
       if (solver == null) {
         // This is the first iteration, return top.
         currentTopValues.add(new LocationIdentifier(stmt, symbol, field, type, operation));
-        return Collections.singleton(ArgumentValueManager.v().getTopFieldTransformer(type));
+        return Collections.singleton(ArgumentValueManager.v().getTopFieldTransformer(type,
+            operation));
       }
     }
 
     if (logger.isDebugEnabled()) {
       logger.debug("Making transformer for " + symbol + " for " + field + " at \n" + stmt);
     }
-    Boolean[] returnedTop = new Boolean[1];
-    Set<FieldTransformer> result =
-        FieldTransformerUtils.makeTransformersFromReferencedValue(stmt, symbol, field, type,
-            solver, operation, returnedTop);
 
-    if (returnedTop[0]) {
+    BasePropagationValue referencedBaseValue = solver.resultAt(stmt, symbol);
+    if (referencedBaseValue == null || referencedBaseValue instanceof TopPropagationValue) {
       // This is not the first iteration, but we still got top.
       logger.info("Found top at " + stmt);
-      if (logger.isDebugEnabled()) {
-        logger.debug("Result contains top field transformer");
-      }
       synchronized (this) {
         currentTopValues.add(new LocationIdentifier(stmt, symbol, field, type, operation));
       }
+      return Collections
+          .singleton(ArgumentValueManager.v().getTopFieldTransformer(type, operation));
     }
+
+    PropagationValue referencedPropagationValue = (PropagationValue) referencedBaseValue;
+
+    Set<FieldValue> fieldValues = referencedPropagationValue.getValuesForField(field);
+    Set<FieldTransformer> result = new HashSet<>();
+    for (FieldValue fieldValue : fieldValues) {
+      if (fieldValue != null) {
+        result.add(FieldTransformerManager.v().makeFieldTransformer(operation,
+            fieldValue.getValue()));
+      } else {
+        result.add(null);
+      }
+    }
+
+    if (logger.isDebugEnabled()) {
+      logger.debug("Returning " + result.toString());
+    }
+
     return result;
   }
 }

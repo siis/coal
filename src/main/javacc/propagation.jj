@@ -43,6 +43,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import edu.psu.cse.siis.coal.Constants;
 import edu.psu.cse.siis.coal.ExtendedSignature;
 import edu.psu.cse.siis.coal.Model;
 import edu.psu.cse.siis.coal.arguments.Argument;
@@ -248,10 +249,21 @@ void fieldDeclaration() : {
   Token t;
   String name;
   String type;
+  String optional;
   int count = -1;
 }{
   t = <IDENTIFIER>
   { type = t.image; }
+
+  [ "<"
+    t = <IDENTIFIER>
+    ">"
+    {
+      optional = t.image;
+      type = type + "<" + optional + ">";
+    }
+  ]
+
   t = <IDENTIFIER>
   { name = t.image; }
   [ count = count() ]
