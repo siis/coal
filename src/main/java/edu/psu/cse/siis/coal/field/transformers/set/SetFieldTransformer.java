@@ -47,7 +47,7 @@ public class SetFieldTransformer extends FieldTransformer {
   public FieldValue apply(FieldValue fieldValue) {
     SetFieldValue result = new SetFieldValue();
 
-    assert this.transformerSequence != null || (fieldValue.hasTransformerSequence() && !this.clear);
+    assert this.transformerSequence == null && (!fieldValue.hasTransformerSequence() || this.clear);
     // result = new IntermediateFieldValue();
 
     if (!this.clear) {

@@ -93,8 +93,8 @@ public class PathValue {
       }
       return result;
     } else {
-      throw new RuntimeException("Could not apply getScalarFieldValue to non-scalar type "
-          + this.getClass());
+      throw new RuntimeException("Could not apply getSetFieldValue to non-set type "
+          + fieldValue.getClass() + ": " + fieldValue);
     }
   }
 

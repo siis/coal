@@ -227,7 +227,7 @@ public class SetFieldTransformerTest {
   // }
 
   private void testApplyHelper(boolean clear, FieldValue expectedFieldValue) {
-    FieldTransformer fieldTransformer = makeSecondFieldTransformer(clear);
+    SetFieldTransformer fieldTransformer = makeSecondFieldTransformer(clear);
 
     FieldValue fieldValue = makeInitialFieldValue(false);
 
@@ -252,7 +252,7 @@ public class SetFieldTransformerTest {
     return fieldTransformer;
   }
 
-  private FieldTransformer makeSecondFieldTransformer(boolean clear) {
+  private SetFieldTransformer makeSecondFieldTransformer(boolean clear) {
     SetFieldTransformer fieldTransformer = new SetFieldTransformer();
     fieldTransformer.clear = clear;
     fieldTransformer.add = new HashSet<>();
@@ -265,7 +265,7 @@ public class SetFieldTransformerTest {
     return fieldTransformer;
   }
 
-  private FieldValue makeInitialFieldValue(boolean intermediate) {
+  private SetFieldValue makeInitialFieldValue(boolean intermediate) {
     // FieldValue fieldValue = intermediate ? new IntermediateFieldValue() : new FieldValue();
     SetFieldValue setFieldValue = new SetFieldValue();
 
