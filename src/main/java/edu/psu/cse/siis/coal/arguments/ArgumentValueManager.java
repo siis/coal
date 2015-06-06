@@ -75,6 +75,21 @@ public class ArgumentValueManager {
   }
 
   /**
+   * Returns the argument value analysis associated with a given type.
+   * 
+   * @param type An argument value type.
+   * @return An argument value analysis.
+   */
+  public ArgumentValueAnalysis getArgumentValueAnalysis(String type) {
+    ArgumentValueAnalysis analysis = argumentValueAnalysisMap.get(type);
+    if (analysis == null) {
+      throw new RuntimeException("No analysis for type " + type);
+    }
+
+    return analysis;
+  }
+
+  /**
    * Registers default argument value analyses, which are provided as part of the vanilla COAL
    * solver.
    */
@@ -128,11 +143,6 @@ public class ArgumentValueManager {
    * @return A field transformer.
    */
   public FieldTransformer getTopFieldTransformer(String type, String operation) {
-    ArgumentValueAnalysis analysis = argumentValueAnalysisMap.get(type);
-    if (analysis == null) {
-      throw new RuntimeException("No analysis for type " + type);
-    }
-
     String key = new StringBuilder(type).append("::").append(operation).toString();
     FieldTransformer fieldTransformer = topFieldTransformerMap.get(key);
     if (fieldTransformer == null) {
@@ -149,10 +159,7 @@ public class ArgumentValueManager {
    * @return An field transformer.
    */
   private FieldTransformer makeTopFieldTransformer(String type, String operation) {
-    ArgumentValueAnalysis analysis = argumentValueAnalysisMap.get(type);
-    if (analysis == null) {
-      throw new RuntimeException("No analysis for type " + type);
-    }
+    ArgumentValueAnalysis analysis = getArgumentValueAnalysis(type);
 
     return FieldTransformerManager.v().makeFieldTransformer(operation, analysis.getTopValue());
   }
@@ -169,11 +176,7 @@ public class ArgumentValueManager {
     String type = argument.getType();
     String[] inlineValues = argument.getInlineValues();
 
-    ArgumentValueAnalysis analysis = argumentValueAnalysisMap.get(type);
-    if (analysis == null) {
-      throw new RuntimeException("No analysis for type " + type + " in argument "
-          + argument.toString());
-    }
+    ArgumentValueAnalysis analysis = getArgumentValueAnalysis(type);
 
     if (inlineValues == null) {
       ExecutorService pool = Executors.newFixedThreadPool(1);

@@ -40,9 +40,9 @@ public abstract class FieldTransformerFactory {
   }
 
   /**
-   * Returns a field transformer for a given variable, a given statement and an operation. At the
-   * moment, this is only used by {@link FieldAddSequenceElementTransformerFactory} for composed
-   * values.
+   * Returns a field transformer for a given variable, a given statement and an operation.
+   * 
+   * At the moment, this is not used.
    * 
    * @param symbol A COAL symbol (variable).
    * @param stmt A COAL modifier.

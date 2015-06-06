@@ -46,17 +46,6 @@ public class IntValueAnalysis extends BackwardValueAnalysis {
   private static final int TOP_VALUE = Constants.ANY_INT;
 
   @Override
-  public Set<Object> computeArgumentValues(Argument argument, Unit callSite) {
-    Stmt stmt = (Stmt) callSite;
-    if (!stmt.containsInvokeExpr()) {
-      throw new RuntimeException("Statement " + stmt + " does not contain an invoke expression");
-    }
-    Value value = stmt.getInvokeExpr().getArg(argument.getArgnum()[0]);
-
-    return findIntConstantValues(stmt, value);
-  }
-
-  @Override
   public Set<Object> computeInlineArgumentValues(String[] inlineValues) {
     Set<Object> result = new HashSet<>(inlineValues.length);
 
@@ -70,11 +59,12 @@ public class IntValueAnalysis extends BackwardValueAnalysis {
   /**
    * Returns the possible values for an integer variable.
    * 
-   * @param start The statement where the variable is used.
    * @param value The variable whose value we are looking for.
+   * @param start The statement where the variable is used.
    * @return The set of possible values for the variable.
    */
-  private Set<Object> findIntConstantValues(Unit start, Value value) {
+  @Override
+  public Set<Object> computeVariableValues(Value value, Stmt start) {
     if (value instanceof IntConstant) {
       return Collections.singleton((Object) ((IntConstant) value).value);
     } else if (value instanceof LongConstant) {
@@ -94,7 +84,7 @@ public class IntValueAnalysis extends BackwardValueAnalysis {
    * @param visitedStmts The set of visited statement.
    * @return The set of possible values for the local variable.
    */
-  private Set<Object> findIntAssignmentsForLocal(Unit start, Local local, Set<Stmt> visitedStmts) {
+  private Set<Object> findIntAssignmentsForLocal(Stmt start, Local local, Set<Stmt> visitedStmts) {
     List<DefinitionStmt> assignStmts =
         findAssignmentsForLocal(start, local, true, new HashSet<Pair<Unit, Local>>());
     Set<Object> result = new HashSet<>(assignStmts.size());

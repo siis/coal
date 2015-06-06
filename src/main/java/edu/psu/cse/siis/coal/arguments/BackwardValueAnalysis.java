@@ -39,7 +39,7 @@ import edu.psu.cse.siis.coal.AnalysisParameters;
 /**
  * An abstract backward argument value analysis, which provides utility functions.
  */
-public abstract class BackwardValueAnalysis implements ArgumentValueAnalysis {
+public abstract class BackwardValueAnalysis extends ArgumentValueAnalysis {
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
   /**

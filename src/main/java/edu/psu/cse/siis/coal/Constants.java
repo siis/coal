@@ -26,6 +26,7 @@ public class Constants {
   public static final String ANY_CLASS = "(.*)";
   public static final int ANY_INT = -1;
   public static final int VALUE_LIMIT = 256;
+  public static final int INSTANCE_INVOKE_BASE_INDEX = -1;
 
   public static class DefaultActions {
     public static class Scalar {

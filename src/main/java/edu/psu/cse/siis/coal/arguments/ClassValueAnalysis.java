@@ -55,17 +55,6 @@ public class ClassValueAnalysis extends BackwardValueAnalysis {
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
   @Override
-  public Set<Object> computeArgumentValues(Argument argument, Unit callSite) {
-    Stmt stmt = (Stmt) callSite;
-    if (!stmt.containsInvokeExpr()) {
-      throw new RuntimeException("Statement " + stmt + " does not contain an invoke expression");
-    }
-    Value value = stmt.getInvokeExpr().getArg(argument.getArgnum()[0]);
-
-    return findClassConstantValues(callSite, value);
-  }
-
-  @Override
   public Set<Object> computeInlineArgumentValues(String[] inlineValues) {
     return new HashSet<Object>(Arrays.asList(inlineValues));
   }
@@ -73,11 +62,12 @@ public class ClassValueAnalysis extends BackwardValueAnalysis {
   /**
    * Returns the set of possible values of a variable of type class.
    * 
-   * @param start The statement where the analysis should start.
    * @param value The variable whose value we are looking for.
+   * @param start The statement where the analysis should start.
    * @return The set of possible values for the variable.
    */
-  public Set<Object> findClassConstantValues(Unit start, Value value) {
+  @Override
+  public Set<Object> computeVariableValues(Value value, Stmt start) {
     if (value instanceof ClassConstant) {
       return Collections.singleton((Object) ((ClassConstant) value).getValue());
     } else if (value instanceof Local) {
@@ -113,7 +103,7 @@ public class ClassValueAnalysis extends BackwardValueAnalysis {
           Edge edge = edges.next();
           InvokeExpr invokeExpr = edge.srcStmt().getInvokeExpr();
           Set<Object> newResults =
-              findClassConstantValues(edge.srcStmt(), invokeExpr.getArg(parameterRef.getIndex()));
+              computeVariableValues(invokeExpr.getArg(parameterRef.getIndex()), edge.srcStmt());
           if (newResults.contains(TOP_VALUE) || newResults.contains(Constants.ANY_STRING)) {
             return Collections.singleton((Object) TOP_VALUE);
           } else {
@@ -128,7 +118,9 @@ public class ClassValueAnalysis extends BackwardValueAnalysis {
             || method.getSignature().equals(
                 "<java.lang.ClassLoader: java.lang.Class loadClass(java.lang.String)>")) {
           Set<Object> classNames =
-              StringValueAnalysis.findStringConstantValues(assignStmt, invokeExpr.getArg(0));
+              ArgumentValueManager.v()
+                  .getArgumentValueAnalysis(Constants.DefaultArgumentTypes.Scalar.STRING)
+                  .computeVariableValues(invokeExpr.getArg(0), assignStmt);
           if (classNames.contains(TOP_VALUE)) {
             return Collections.singleton((Object) TOP_VALUE);
           } else {

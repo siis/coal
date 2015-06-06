@@ -24,7 +24,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import soot.Local;
-import soot.Unit;
 import soot.Value;
 import soot.jimple.NullConstant;
 import soot.jimple.Stmt;
@@ -37,7 +36,7 @@ import edu.psu.cse.siis.coal.arguments.LanguageConstraints.Call;
 /**
  * An argument value analysis for string types.
  */
-public class StringValueAnalysis implements ArgumentValueAnalysis {
+public class StringValueAnalysis extends ArgumentValueAnalysis {
   private static final String TOP_VALUE = Constants.ANY_STRING;
 
   /**
@@ -56,24 +55,6 @@ public class StringValueAnalysis implements ArgumentValueAnalysis {
   }
 
   @Override
-  public Set<Object> computeArgumentValues(Argument argument, Unit callSite) {
-    if (argument.getArgnum() == null) {
-      return null;
-    }
-    if (AnalysisParameters.v().useShimple()) {
-      return Collections.singleton((Object) TOP_VALUE);
-    } else {
-      Stmt stmt = (Stmt) callSite;
-      if (!stmt.containsInvokeExpr()) {
-        throw new RuntimeException("Statement " + stmt + " does not contain an invoke expression");
-      }
-      Value value = stmt.getInvokeExpr().getArg(argument.getArgnum()[0]);
-
-      return findStringConstantValues(callSite, value);
-    }
-  }
-
-  @Override
   public Set<Object> computeInlineArgumentValues(String[] inlineValues) {
     return new HashSet<Object>(Arrays.asList(inlineValues));
   }
@@ -81,11 +62,12 @@ public class StringValueAnalysis implements ArgumentValueAnalysis {
   /**
    * Returns the string values of a variable used at a given statement.
    * 
-   * @param start The statement that uses the variable whose values should be determined.
    * @param value The value or variable that should be determined.
+   * @param stmt The statement that uses the variable whose values should be determined.
    * @return The set of possible values.
    */
-  static Set<Object> findStringConstantValues(Unit start, Value value) {
+  @Override
+  public Set<Object> computeVariableValues(Value value, Stmt stmt) {
     if (value instanceof StringConstant) {
       return Collections.singleton((Object) ((StringConstant) value).value.intern());
     } else if (value instanceof NullConstant) {
@@ -95,8 +77,8 @@ public class StringValueAnalysis implements ArgumentValueAnalysis {
 
       ConstraintCollector constraintCollector =
           new ConstraintCollector(new ExceptionalUnitGraph(AnalysisParameters.v().getIcfg()
-              .getMethodOf(start).getActiveBody()));
-      LanguageConstraints.Box lcb = constraintCollector.getConstraintOfAt(local, (Stmt) start);
+              .getMethodOf(stmt).getActiveBody()));
+      LanguageConstraints.Box lcb = constraintCollector.getConstraintOfAt(local, stmt);
       RecursiveDAGSolverVisitorLC dagvlc =
           new RecursiveDAGSolverVisitorLC(5, null,
               new RecursiveDAGSolverVisitorLC.MethodReturnValueAnalysisInterface() {
