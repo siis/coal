@@ -23,6 +23,8 @@ import java.util.Set;
 
 /**
  * A field transformer for replace operations.
+ * 
+ * It is possible to replace set values with either a single value or a set of values.
  */
 public class Replace extends SetFieldTransformer {
   @SuppressWarnings("unchecked")
@@ -30,7 +32,7 @@ public class Replace extends SetFieldTransformer {
     this.clear = true;
     this.add = new HashSet<>(2);
     if (value instanceof Set) {
-      this.add.add((Set<Object>) value);
+      this.add.addAll((Set<Object>) value);
     } else {
       this.add.add(value);
     }
