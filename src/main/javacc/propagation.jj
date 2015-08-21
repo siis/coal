@@ -43,7 +43,6 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import edu.psu.cse.siis.coal.Constants;
 import edu.psu.cse.siis.coal.ExtendedSignature;
 import edu.psu.cse.siis.coal.Model;
 import edu.psu.cse.siis.coal.arguments.Argument;
@@ -212,12 +211,14 @@ TOKEN : {
   <#DIGIT: ["0"-"9"]>
 }
 
-void start() : {
-  namedArguments = new HashMap<String, Argument>();
-  namedSuperclasses = new HashMap<String, String>();
-  fields = new HashMap<String, Field>();
-}{
-  (object())+
+void start() : {}{
+  ({
+    namedArguments = new HashMap<String, Argument>();
+    namedSuperclasses = new HashMap<String, String>();
+    fields = new HashMap<String, Field>();
+  }
+  object()
+  )+
 }
 
 void object() : {}{
