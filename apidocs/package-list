@@ -2,6 +2,8 @@ edu.psu.cse.siis.coal
 edu.psu.cse.siis.coal.arguments
 edu.psu.cse.siis.coal.field
 edu.psu.cse.siis.coal.field.transformers
+edu.psu.cse.siis.coal.field.transformers.scalar
+edu.psu.cse.siis.coal.field.transformers.set
 edu.psu.cse.siis.coal.field.values
 edu.psu.cse.siis.coal.lang
 edu.psu.cse.siis.coal.transformers
