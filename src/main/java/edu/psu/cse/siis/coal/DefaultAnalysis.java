@@ -35,6 +35,7 @@ import soot.Transform;
 import soot.Value;
 import soot.options.Options;
 import edu.psu.cse.siis.coal.arguments.ArgumentValueManager;
+import edu.psu.cse.siis.coal.arguments.MethodReturnValueManager;
 import edu.psu.cse.siis.coal.field.transformers.FieldTransformerManager;
 
 /**
@@ -59,6 +60,7 @@ public class DefaultAnalysis<A extends CommandLineArguments> extends Analysis<A>
 
   @Override
   protected void registerMethodReturnValueAnalyses(A commandLineArguments) {
+    MethodReturnValueManager.v().registerDefaultMethodReturnValueAnalyses();
   }
 
   @Override
